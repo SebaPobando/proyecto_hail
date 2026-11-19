@@ -163,44 +163,138 @@ project_hail/
 │   └── tests/          pruebas de aislamiento, autenticación y plataforma
 ├── frontend/           pantallas React (HMI actuales)
 ├── infra/              servicios de desarrollo (base de datos, Redis, broker)
-├── docs/               roadmap, arquitectura, decisiones, documentos anteriores
+├── docs/               roadmap, arquitectura, decisiones, guía de prueba local
+├── scripts/            instalación e inicio con doble clic (Windows)
+├── instalar.cmd        doble clic: instala todo para probar en local
+├── iniciar.cmd         doble clic: abre Hail (backend, simulador y pantallas)
 └── .github/workflows/  integración continua: pruebas y compilación
 ```
 
-## Puesta en marcha (Windows / PowerShell)
+## Probarlo en tu computador (sin programar)
 
-Requisitos: Python 3.12+, Node.js 22, Docker Desktop.
+Para Gabriel, Jorge o cualquiera que quiera ver Hail funcionando sin escribir comandos: **[docs/GUIA_PRUEBA_LOCAL.md](docs/GUIA_PRUEBA_LOCAL.md)**. En resumen: instalar Git, Python y Node.js, descargar el proyecto, y luego doble clic en `instalar.cmd` (una vez) e `iniciar.cmd` (cada vez que se use).
+
+## Puesta en marcha para desarrollo (Windows / PowerShell)
+
+Lo mismo que hacen `instalar.cmd` e `iniciar.cmd`, pero paso a paso y con la opción de usar Docker. Toma unos 15 minutos la primera vez.
+
+**Requisitos**
+
+| Programa | Versión | Para qué |
+| --- | --- | --- |
+| [Git](https://git-scm.com/download/win) | cualquiera reciente | descargar el código |
+| [Python](https://www.python.org/downloads/) | 3.12 o superior (marca "Add python.exe to PATH" al instalar) | backend |
+| [Node.js](https://nodejs.org/) | 22 LTS | pantallas |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | opcional | base de datos real y broker MQTT. Sin Docker se usa SQLite |
+
+Para revisar lo instalado: `git --version`, `python --version`, `node --version`, `docker --version`.
+
+### Paso 1 · Descargar el código
 
 ```powershell
-# 1. Servicios: PostgreSQL + TimescaleDB y Redis (--wait espera a que la base esté lista)
-docker compose -f infra/compose.yaml up -d --wait db redis
+git clone https://github.com/SebaPobando/proyecto_hail.git
+cd proyecto_hail
+```
 
-# 2. Backend
+Si el repositorio es privado, pídele a Seba que te agregue como colaborador en GitHub.
+
+### Paso 2 · Base de datos (solo con Docker)
+
+Con Docker Desktop abierto:
+
+```powershell
+docker compose -f infra/compose.yaml up -d --wait db redis
+```
+
+La primera vez descarga las imágenes y tarda unos minutos. Sin Docker, sáltate este paso.
+
+### Paso 3 · Backend (terminal 1)
+
+```powershell
 cd backend
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1           # el prompt pasa a decir (.venv)
 pip install -r requirements-dev.txt
 Copy-Item .env.example .env
-# Sin Docker: en backend\.env cambia DATABASE_URL por  sqlite:///db.sqlite3
+```
+
+**Sin Docker:** abre `backend\.env` y cambia la línea `DATABASE_URL=...` por `DATABASE_URL=sqlite:///db.sqlite3`.
+
+```powershell
 python manage.py migrate
-python manage.py createsuperuser          # cuenta de administrador global
+python manage.py createsuperuser          # tu cuenta de administrador (correo y contraseña a elección)
 python manage.py seed_demo --demo-users   # carga AguaPozo, Medidores y Nutrial + un usuario por cliente
 python manage.py runserver
 ```
 
-- Administración: http://localhost:8000/admin/
-- API con documentación interactiva: http://localhost:8000/api/docs
-- Usuarios de prueba: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local` (contraseña `hail-demo-2026`, solo en desarrollo).
+Deja esta terminal abierta. El backend queda en http://localhost:8000.
 
-**Datos simulados sin broker** (otra terminal, con el entorno activado):
+### Paso 4 · Datos simulados (terminal 2)
+
+Abre otra terminal en la carpeta del proyecto:
 
 ```powershell
-python manage.py simulate_telemetry --direct   # escribe directo en la base cada 10 s
+cd backend
+.\.venv\Scripts\Activate.ps1
+python manage.py simulate_telemetry --direct   # escribe lecturas simuladas cada 10 s
 ```
 
-Los datos entran en Admin → Telemetría → Lecturas actuales, y en la API: `GET /api/projects/aguapozo/latest`.
+### Paso 5 · Pantallas (terminal 3)
 
-### Recepción real por MQTT (Docker)
+```powershell
+cd frontend
+npm.cmd install
+npm.cmd run dev
+```
+
+### Qué revisar
+
+| Dirección | Qué se ve |
+| --- | --- |
+| http://127.0.0.1:5173/?source=portal | Las pantallas: portal con AguaPozo, Medidores ULagos y Nutrial (datos de demostración) |
+| http://localhost:8000/admin/ | Administración: organizaciones, proyectos, equipos, señales, usuarios. Entra con la cuenta del paso 3 |
+| http://localhost:8000/admin/telemetry/latestreading/ | Lecturas que va dejando el simulador, actualizadas cada 10 s |
+| http://localhost:8000/api/docs | La API con documentación interactiva |
+
+Usuarios de cliente para probar el aislamiento entre proyectos: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local`, todos con contraseña `hail-demo-2026` (solo en desarrollo). Cada uno ve únicamente su proyecto.
+
+> **Ojo:** hasta la fase F3 las pantallas usan el prototipo con datos de demostración y todavía no leen del backend. Lo que llega del simulador se ve en la administración y en la API.
+
+### Los días siguientes
+
+Ya no hay que instalar nada. Para volver a levantarlo:
+
+```powershell
+git pull                                             # trae los últimos cambios
+docker compose -f infra/compose.yaml up -d --wait db redis   # solo con Docker
+# terminal 1
+cd backend; .\.venv\Scripts\Activate.ps1; python manage.py migrate; python manage.py runserver
+# terminal 2
+cd backend; .\.venv\Scripts\Activate.ps1; python manage.py simulate_telemetry --direct
+# terminal 3
+cd frontend; npm.cmd install; npm.cmd run dev
+```
+
+`migrate` y `npm.cmd install` no hacen nada si no hubo cambios, pero conviene correrlos después de cada `git pull`.
+
+### Problemas comunes
+
+| Síntoma | Causa y solución |
+| --- | --- |
+| `Activate.ps1 no se puede cargar porque la ejecución de scripts está deshabilitada` | Windows bloquea los scripts por defecto. Corre una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` y responde `S`. |
+| `npm : No se puede cargar el archivo npm.ps1` | Mismo bloqueo. Usa `npm.cmd` en vez de `npm` (como en esta guía) o aplica el comando de la fila anterior. |
+| `No module named 'django'` | El entorno no está activado. Corre `.\.venv\Scripts\Activate.ps1` dentro de `backend` (el prompt debe decir `(.venv)`). |
+| `python` abre la Microsoft Store o no se reconoce | Python no quedó en el PATH. Reinstálalo marcando "Add python.exe to PATH", o usa `py -3.12` en vez de `python`. |
+| `ports are not available ... 5432` o `la autentificación password falló para el usuario hail` | Hay un PostgreSQL instalado en el equipo usando el 5432. La base de Docker usa el **5433**: revisa que `DATABASE_URL` en `backend\.env` diga `127.0.0.1:5433`. |
+| `server closed the connection unexpectedly` al hacer `migrate` | La base aún se estaba inicializando (la primera vez tarda unos segundos y se reinicia por dentro). Levántala con `--wait` o espera a que `docker compose -f infra/compose.yaml ps` diga `healthy`, y repite `migrate`. |
+| `error during connect` o `docker daemon is not running` | Docker Desktop no está abierto. Ábrelo y espera a que diga "Engine running". |
+| El simulador dice "No hay broker" o el contenedor `mqtt` se reinicia | Faltan los archivos de usuarios del broker: corre `python manage.py mqtt_sync_auth` (necesita la base arriba). |
+
+Si cambias de SQLite a PostgreSQL, la base nueva parte vacía: repite `migrate`, `createsuperuser` y `seed_demo`.
+
+### Recepción real por MQTT (opcional, con Docker)
+
+Lo anterior escribe los datos simulados directo en la base. Para probar el camino completo de un equipo de campo (equipo → broker MQTT → worker → base):
 
 El broker no acepta conexiones anónimas: cada equipo tiene su usuario y solo puede publicar en su tópico.
 
@@ -208,31 +302,14 @@ El broker no acepta conexiones anónimas: cada equipo tiene su usuario y solo pu
 # 1. En backend\.env: DATABASE_URL de PostgreSQL (127.0.0.1:5433) y las cuentas MQTT (ver .env.example)
 # 2. Genera los archivos de usuarios y permisos del broker desde la base
 python manage.py mqtt_sync_auth
-# 3. Levanta (o reinicia) los servicios; --wait espera a que la base esté lista
+# 3. Levanta (o reinicia) todos los servicios
 docker compose -f infra/compose.yaml up -d --wait
-# 4. Worker y simulador, cada uno en su terminal
+# 4. Worker y simulador, cada uno en su terminal (en vez del simulador --direct)
 python manage.py ingest_mqtt
 python manage.py simulate_telemetry
 ```
 
 Para dar acceso a un equipo de campo: Admin → Dispositivos → usuario MQTT y nueva contraseña. Luego `python manage.py mqtt_sync_auth` y `docker compose -f infra/compose.yaml kill -s SIGHUP mqtt` (el broker relee los permisos sin cortar a nadie).
-
-Si cambias de SQLite a PostgreSQL, la base nueva parte vacía: repite `migrate`, `createsuperuser` y `seed_demo`.
-
-**Problemas comunes**
-
-| Síntoma | Causa y solución |
-| --- | --- |
-| `ports are not available ... 5432` o `la autentificación password falló para el usuario hail` | Hay un PostgreSQL instalado en el equipo usando el 5432. La base de Docker usa el **5433**: revisa que `DATABASE_URL` en `backend\.env` diga `127.0.0.1:5433`. |
-| El simulador dice "No hay broker" o el contenedor `mqtt` se reinicia | Faltan los archivos de usuarios del broker: corre `python manage.py mqtt_sync_auth` (necesita la base arriba). |
-| `server closed the connection unexpectedly` al hacer `migrate` | La base aún se estaba inicializando (la primera vez tarda unos segundos y se reinicia por dentro). Levántala con `--wait` o espera a que `docker compose ps` diga `healthy`, y repite `migrate`. |
-
-```powershell
-# 3. Pantallas (otra terminal). Usan el prototipo con Firebase hasta la fase F3.
-cd frontend
-npm.cmd install
-npm.cmd run dev
-```
 
 ## Pruebas
 
@@ -246,6 +323,7 @@ Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para corr
 
 ## Documentación
 
+- [Guía para probar Hail en local](docs/GUIA_PRUEBA_LOCAL.md): para quien no programa; instalación con doble clic.
 - [Roadmap](docs/ROADMAP.md): fases, entregables y fechas estimadas.
 - [Arquitectura](docs/ARQUITECTURA.md): componentes, modelo de datos, API y convenciones del código.
 - [Protocolo MQTT](docs/PROTOCOLO_MQTT.md): cómo debe publicar un equipo de campo; qué falta de la CBOX.

@@ -1,0 +1,150 @@
+# Guía para probar Hail en tu computador
+
+Esta guía es para levantar Hail en un computador con Windows **sin saber programar**. No hay que escribir código: se instalan tres programas, se descarga el proyecto y se usan dos archivos con doble clic.
+
+- **Tiempo:** unos 30 minutos la primera vez (casi todo es esperar descargas). Después, abrir Hail toma menos de un minuto.
+- **Qué necesitas:** Windows 10 u 11, conexión a internet y acceso al repositorio de GitHub (pídeselo a Seba).
+- **Qué no se toca:** Hail queda funcionando solo en tu computador. No se conecta a ninguna planta ni a equipos reales; los datos son simulados.
+
+## Qué vas a tener al final
+
+- **Las pantallas de Hail** en el navegador: el portal con los tres proyectos de ejemplo (AguaPozo, Medidores ULagos y Nutrial).
+- **La administración**: donde se ven y editan los clientes, proyectos, equipos de campo, señales y las lecturas que van llegando.
+- **Un simulador** que inventa lecturas cada 10 segundos, como si hubiera equipos enviando datos.
+
+## Paso 1 · Instalar tres programas (una sola vez)
+
+Instálalos en este orden. En todos puedes aceptar las opciones que vienen marcadas, salvo lo que se indica.
+
+1. **Git** (sirve para descargar el proyecto y sus actualizaciones)
+   Descarga: https://git-scm.com/download/win → "Click here to download". Instala con **Next** en todas las pantallas.
+
+2. **Python** (el lenguaje del backend)
+   Descarga: https://www.python.org/downloads/ → botón amarillo "Download Python 3.x".
+   **Importante:** en la primera pantalla del instalador marca la casilla **"Add python.exe to PATH"** (abajo) y luego **"Install Now"**. Si no marcas esa casilla, el instalador de Hail no lo va a encontrar.
+
+3. **Node.js** (el que arma las pantallas)
+   Descarga: https://nodejs.org/ → botón de la versión **LTS**. Instala con **Next** en todas las pantallas.
+
+**Después de instalar los tres, reinicia el computador** (o al menos cierra sesión y vuelve a entrar) para que Windows los reconozca.
+
+## Paso 2 · Descargar el proyecto (una sola vez)
+
+1. Abre **PowerShell**: presiona la tecla Windows, escribe `PowerShell` y presiona Enter. Se abre una ventana azul o negra con texto; ahí se escriben comandos.
+2. Copia esta línea, pégala en PowerShell (clic derecho pega) y presiona Enter:
+
+   ```powershell
+   cd $HOME; git clone https://github.com/SebaPobando/proyecto_hail.git
+   ```
+
+   Si aparece una ventana de GitHub pidiendo iniciar sesión, entra con tu cuenta (la que Seba agregó al proyecto). Cuando termine dirá algo como `Resolving deltas: 100%, done.`
+
+3. Para abrir la carpeta descargada, pega esto y presiona Enter:
+
+   ```powershell
+   explorer $HOME\proyecto_hail
+   ```
+
+   El proyecto quedó en `C:\Users\<tu usuario>\proyecto_hail`. Ya puedes cerrar PowerShell.
+
+> **Por qué no en Documentos:** muchas veces la carpeta Documentos está sincronizada con OneDrive, y OneDrive se pone muy lento con los miles de archivos pequeños que descarga el proyecto.
+
+## Paso 3 · Instalar Hail (una sola vez)
+
+En la carpeta `proyecto_hail`, haz **doble clic en `instalar.cmd`**.
+
+Se abre una ventana que avanza por 6 pasos. Va a:
+
+1. Comprobar que Python y Node.js estén instalados.
+2. Descargar las librerías que usa Hail (es lo que más tarda: 5 a 10 minutos).
+3. Crear la base de datos con los tres proyectos de ejemplo.
+4. **Pedirte un correo y una contraseña** para tu cuenta de administrador. Es solo para este computador; puede ser tu correo real. **Mientras escribes la contraseña no se ve nada en pantalla: es normal**, escríbela y presiona Enter.
+
+Cuando termine dirá en verde **"Listo. Ahora haz doble clic en iniciar.cmd"**. Presiona cualquier tecla para cerrar la ventana.
+
+Si aparece un texto en rojo que dice **ERROR**, mira [Si algo falla](#si-algo-falla).
+
+## Paso 4 · Abrir Hail (cada vez que lo quieras usar)
+
+En la carpeta `proyecto_hail`, haz **doble clic en `iniciar.cmd`**.
+
+1. Se abren **tres ventanas nuevas**: "Hail - Backend", "Hail - Simulador de datos" y "Hail - Pantallas". Son las partes de Hail funcionando. **No las cierres mientras lo uses** (puedes minimizarlas).
+2. Cuando todo responda, se abren solas dos pestañas en el navegador: las **pantallas** y la **administración**.
+3. La primera ventana (la de `iniciar.cmd`) ya se puede cerrar.
+
+Si Windows pregunta si permites el acceso de Python o Node.js en el firewall, puedes darle **Cancelar**: Hail funciona solo dentro de tu computador.
+
+**Para apagar Hail**, cierra las tres ventanas "Hail - …". La próxima vez, doble clic en `iniciar.cmd` otra vez. Los datos quedan guardados.
+
+## Paso 5 · Qué mirar
+
+### Las pantallas — http://127.0.0.1:5173/?source=portal
+
+El portal con los tres proyectos. Entra a cada uno:
+
+- **AguaPozo**: HMI de un pozo con estanques, bomba y dosificación de cloro.
+- **Medidores ULagos**: resumen eléctrico de los medidores (tensiones, corrientes, potencias, energía).
+- **Nutrial**: variables de proceso de la planta.
+
+> Por ahora las pantallas muestran **datos de demostración propios**. En la próxima fase (F3) se conectan al backend y mostrarán lo que llega de los equipos, con inicio de sesión por cliente.
+
+### La administración — http://127.0.0.1:8000/admin/
+
+Entra con el correo y la contraseña del paso 3. Lo más interesante:
+
+| Sección | Qué hay |
+| --- | --- |
+| **Organizaciones (clientes)** | Los clientes (cada uno solo verá su proyecto). |
+| **Proyectos** | AguaPozo, Medidores ULagos y Nutrial. |
+| **Dispositivos** | Los equipos de campo de cada proyecto (PLC, medidores, gateway), con su modelo y su usuario MQTT. |
+| **Señales** | Cada variable que mide un equipo: tag, nombre, unidad, rango, si es analógica o digital. **Aquí es donde más sirve tu revisión.** |
+| **Lecturas actuales** | El último valor de cada señal. Con el simulador corriendo, si recargas la página (F5) cada 10 segundos ves cómo cambian. |
+| **Estado de los workers** | Si el servicio que recibe datos por MQTT está vivo (en esta prueba no se usa). |
+
+### Dónde aporta tu revisión
+
+Lo más útil es revisar con ojo de electrónico lo que es de terreno:
+
+- **Señales** de cada equipo: ¿los tags, unidades y rangos tienen sentido? ¿Falta alguna señal importante? ¿Algún estado digital está mal nombrado?
+- **[Protocolo MQTT](PROTOCOLO_MQTT.md)**: cómo tiene que enviar los datos un equipo de campo, y qué falta saber de la CBOX Haiwell para conectarla.
+
+Anota lo que veas (una captura con una nota sirve) y se lo mandas a Seba.
+
+## Paso 6 · Actualizar cuando Seba avise
+
+Cuando haya cambios nuevos:
+
+1. Cierra las tres ventanas de Hail si estaban abiertas.
+2. Abre PowerShell y pega:
+
+   ```powershell
+   cd $HOME\proyecto_hail; git pull
+   ```
+
+3. Haz doble clic en `instalar.cmd` otra vez (no borra nada ni vuelve a pedir la cuenta; solo instala lo nuevo).
+4. Doble clic en `iniciar.cmd`.
+
+## Si algo falla
+
+Lo primero: **una captura de la ventana con el error se la mandas a Seba**. Antes de eso, revisa si es alguno de estos:
+
+| Qué pasa | Qué hacer |
+| --- | --- |
+| "no encontré Python 3.12 o superior" | Reinstala Python marcando **"Add python.exe to PATH"** (ver paso 1) y reinicia el computador. Si al escribir `python` en PowerShell se abre la Microsoft Store, es el mismo problema. |
+| "no encontré Node.js" | Instala Node.js (versión LTS) y reinicia el computador. |
+| `git` no se reconoce como comando | Falta instalar Git o reiniciar después de instalarlo. |
+| Al hacer `git clone` dice `Repository not found` o pide permisos | Tu cuenta de GitHub todavía no tiene acceso: pídele a Seba que te agregue al repositorio. |
+| "no se pudo instalar las librerías…" | Casi siempre es internet. Revisa la conexión y vuelve a hacer doble clic en `instalar.cmd`; continúa donde quedó. |
+| "Hail no está instalado todavía" | Falta el paso 3: doble clic en `instalar.cmd`. |
+| "el backend no partió" | Mira la ventana "Hail - Backend". Si dice `That port is already in use`, hay otra copia de Hail abierta: cierra todas las ventanas "Hail - …" y vuelve a abrir con `iniciar.cmd`. Si no, reinicia el computador y prueba de nuevo. |
+| "las pantallas no partieron" | Mira la ventana "Hail - Pantallas". Si dice que el puerto 5173 está ocupado, cierra todas las ventanas "Hail - …" y vuelve a abrir. |
+| Windows muestra "Windows protegió su PC" al abrir un `.cmd` | Pasa si el proyecto se descargó como ZIP. Clic en **Más información → Ejecutar de todas formas**. |
+| La página dice "No se puede acceder a este sitio" | Las ventanas de Hail están cerradas o todavía partiendo. Espera unos segundos y recarga, o vuelve a abrir con `iniciar.cmd`. |
+| Olvidaste la contraseña de administrador | Pídele a Seba el comando para cambiarla (`python manage.py changepassword tu@correo`). |
+
+## Para curiosos: qué es cada parte
+
+- **Backend**: el "cerebro". Guarda clientes, proyectos, equipos, señales y lecturas en una base de datos, y decide quién puede ver qué. Es la ventana "Hail - Backend".
+- **Simulador de datos**: hace de equipo de campo falso y escribe lecturas cada 10 segundos. En una planta real este lugar lo ocupan los PLC o la CBOX enviando por MQTT.
+- **Pantallas** (frontend): lo que ve el cliente en el navegador. Es la ventana "Hail - Pantallas".
+- **Base de datos**: en esta prueba es un solo archivo, `backend\db.sqlite3`. Si algún día quieres partir de cero, cierra Hail, borra ese archivo y vuelve a hacer doble clic en `instalar.cmd`.
