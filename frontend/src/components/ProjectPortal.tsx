@@ -6,6 +6,7 @@ import type {Telemetry} from '../services/types';
 import ElectricalOverview from './ElectricalOverview';
 import NutrialHmi from './NutrialHmi';
 import './visualIdentity.css';
+import { HailLogo } from '../design-system';
 
 const projects = [
   { id: 'aguapozo', title: 'AguaPozo', category: 'Agua potable', image: 'aguapozo.jpg', alt: 'Diagrama HMI del pozo y del estanque elevado', description: 'Captación, tratamiento y almacenamiento. Consulta niveles, caudal y cloro residual.', status: 'HMI disponible' },
@@ -50,7 +51,7 @@ export default function ProjectPortal({ allowed, role, logout, renderWater, onPr
     <header className="portal-header"><strong>Supervisión industrial IoT</strong><div>{standalone&&<button onClick={()=>setView('portal')}>Mostrar menú de proyectos</button>}<span>{role}</span>{logout}</div></header>
     <div className="portal-layout">
       <aside className="portal-sidebar" aria-label="Menú lateral">
-        <div className="portal-brand"><span>SP</span><div>SUPERVISIÓN<small>Centro de operaciones</small></div></div><nav className="portal-menu" aria-label="Navegación de proyectos">
+        <div className="portal-brand"><HailLogo height={42} tagline="Centro de operaciones" /></div><nav className="portal-menu" aria-label="Navegación de proyectos">
           {operationPages.map(page=><button key={page} type="button" aria-current={!project&&operation===page?'page':undefined} onClick={()=>{setOperation(page);navigate(null);}}><PortalIcon/>{page==='Resumen'?'Centro de operaciones':page}</button>)}
           {visibleProjects.length > 0 && <p className="portal-menu-heading">Instalaciones</p>}
           {visibleProjects.map(item => <button key={item.id} type="button" aria-current={project?.id === item.id ? 'page' : undefined} onClick={() => navigate(item.id)}>

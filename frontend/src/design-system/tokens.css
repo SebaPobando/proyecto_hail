@@ -1,0 +1,141 @@
+/*
+ * Hail · Design tokens
+ * Paleta derivada de la identidad de PROYEC (proyec.cl). Fuente única de colores,
+ * tipografía, espacios y sombras del frontend. Los gráficos (Recharts, SVG) usan
+ * el espejo en tokens.ts; ambos deben mantenerse iguales.
+ *
+ * Reglas de uso (ver design-system/README.md):
+ *  - El azul es la marca y la acción principal.
+ *  - El naranja es solo acento de marca (líneas, foco, indicador activo). Nunca
+ *    representa un estado de proceso, para no confundirse con una advertencia.
+ *  - En pantallas de proceso el color se reserva para estados y alarmas (ISA-101).
+ */
+:root {
+  /* Marca · azul PROYEC */
+  --hail-blue-50: #ebf3fc;
+  --hail-blue-100: #d6e6f8;
+  --hail-blue-200: #a9cbf0;
+  --hail-blue-300: #73a9e5;
+  --hail-blue-400: #3684d6;
+  --hail-blue-500: #005cbd; /* azul PROYEC */
+  --hail-blue-600: #004fa3;
+  --hail-blue-700: #003f85;
+  --hail-royal: #0031a1; /* tramo medio del degradado */
+  --hail-navy: #000e8b; /* extremo oscuro del degradado */
+  --hail-deep: #0b337a; /* fondo de marca */
+  --hail-ink: #0b1f3a; /* texto principal */
+
+  /* Marca · naranja PROYEC (solo acento) */
+  --hail-orange-50: #fff1ea;
+  --hail-orange-400: #f78c1e;
+  --hail-orange-500: #f86419;
+  --hail-orange-600: #fa3d15;
+
+  /* Neutros fríos */
+  --hail-gray-0: #ffffff;
+  --hail-gray-25: #f7f9fc;
+  --hail-gray-50: #f1f5fa;
+  --hail-gray-100: #e6edf5;
+  --hail-gray-200: #d7e3f1;
+  --hail-gray-300: #b9cbdc;
+  --hail-gray-400: #8ba0b6;
+  --hail-gray-500: #56708b; /* texto secundario: 4.7:1 sobre el fondo */
+  --hail-gray-600: #4d6680;
+  --hail-gray-700: #34506e;
+  --hail-gray-800: #1c3654;
+  --hail-gray-900: #0b1f3a;
+
+  /* Degradados de marca */
+  --gradient-brand: linear-gradient(115deg, var(--hail-navy) 0%, var(--hail-royal) 42%, var(--hail-blue-500) 100%);
+  --gradient-brand-soft: linear-gradient(105deg, var(--hail-blue-700) 0%, var(--hail-blue-500) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--hail-orange-600) 0%, var(--hail-orange-400) 100%);
+
+  /* Semánticos de interfaz */
+  --color-bg: var(--hail-gray-50);
+  --color-surface: var(--hail-gray-0);
+  --color-surface-muted: var(--hail-gray-25);
+  --color-surface-brand: var(--hail-blue-50);
+  --color-border: var(--hail-gray-200);
+  --color-border-strong: var(--hail-gray-300);
+  --color-text: var(--hail-ink);
+  --color-text-muted: var(--hail-gray-500);
+  --color-text-subtle: var(--hail-gray-500); /* gray-400 solo para bordes e íconos decorativos */
+  --color-text-inverse: var(--hail-gray-0);
+  --color-heading: var(--hail-blue-700);
+  --color-primary: var(--hail-blue-500);
+  --color-primary-hover: var(--hail-blue-600);
+  --color-primary-strong: var(--hail-blue-700);
+  --color-accent: var(--hail-orange-500);
+  --color-link: var(--hail-blue-500);
+  --color-focus: var(--hail-orange-500);
+
+  /* Estados de proceso y de datos (no usar el naranja de marca aquí) */
+  --status-ok: #237536; /* en marcha, en línea */
+  --status-ok-bg: #e6f4ea;
+  --status-ok-indicator: #78bd39;
+  --status-stopped: #546a7e; /* detenido, inactivo */
+  --status-stopped-bg: #eef2f6;
+  --status-stopped-indicator: #9aadb9;
+  --status-warning: #8a5a00; /* texto sobre fondo claro */
+  --status-warning-bg: #fff6db;
+  --status-warning-indicator: #ffb819;
+  --status-critical: #b42318;
+  --status-critical-bg: #fdecea;
+  --status-critical-indicator: #ed353b;
+  --status-info: var(--hail-blue-600);
+  --status-info-bg: var(--hail-blue-50);
+  --status-simulated: #5b3fb0; /* datos simulados: siempre distinguibles de los reales */
+  --status-simulated-bg: #f0ecfa;
+  --status-stale: var(--hail-gray-500); /* dato vencido o sin datos */
+  --status-stale-bg: var(--hail-gray-50);
+
+  /* Tipografía */
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Saira', 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 21px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-display: 44px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --tracking-caps: 0.12em; /* rótulos en mayúscula */
+  --tracking-wide: 0.3em; /* lema de marca */
+
+  /* Espacios (base 4 px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Bordes */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* Sombras (tinte azul) */
+  --shadow-sm: 0 1px 3px rgb(11 51 122 / 6%);
+  --shadow-md: 0 5px 16px rgb(11 51 122 / 8%), 0 1px 3px rgb(11 51 122 / 5%);
+  --shadow-lg: 0 20px 55px rgb(11 51 122 / 14%), 0 2px 8px rgb(11 51 122 / 5%);
+  --shadow-focus: 0 0 0 3px rgb(248 100 25 / 45%);
+
+  /* Movimiento */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

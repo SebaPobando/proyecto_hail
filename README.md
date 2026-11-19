@@ -9,6 +9,12 @@ Está pensada para atender a **varios clientes a la vez** desde una sola platafo
 
 ---
 
+## Identidad visual
+
+Hail usa la paleta de PROYEC: azul de marca, acento naranja y formas rectas. Colores, tipografía, logo y componentes están en el [design system de Hail](https://claude.ai/artifact/LafspLZ7MAk8BhUgVa1XxS) y en el código en `frontend/src/design-system/`.
+
+---
+
 ## Equipo
 
 | Integrante | Profesión |
@@ -243,5 +249,6 @@ Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para corr
 - [Roadmap](docs/ROADMAP.md): fases, entregables y fechas estimadas.
 - [Arquitectura](docs/ARQUITECTURA.md): componentes, modelo de datos, API y convenciones del código.
 - [Protocolo MQTT](docs/PROTOCOLO_MQTT.md): cómo debe publicar un equipo de campo; qué falta de la CBOX.
-- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT.
+- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system.
+- [Design system](frontend/src/design-system/README.md): reglas de color, tipografía, estados y componentes.
 - [Operación del prototipo](docs/legacy/OPERACION.md): verificaciones pendientes antes de operar con equipos reales.

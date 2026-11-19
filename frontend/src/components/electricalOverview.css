@@ -1,55 +1,55 @@
 .electrical-dashboard { color: #153656; }
 .electric-heading { display:flex; justify-content:space-between; gap:16px; align-items:center; flex-wrap:wrap; margin: 4px 0 20px; }
-.electric-heading h2 { margin:0 0 8px; font-size:25px; color:#064b8b; }
-.electric-heading p { margin:0; font-size:14px; color:#71859b; }
+.electric-heading h2 { margin:0 0 8px; font-size:25px; color:var(--color-primary-strong); }
+.electric-heading p { margin:0; font-size:14px; color:var(--color-text-muted); }
 .electric-demo { padding:7px 10px; background:#fff3d9; color:#876019; border-radius:6px; font-size:11px; }
-.electric-navigation { display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:#fff; border:1px solid #dbe5f0; border-radius:10px; margin-bottom:22px; }
+.electric-navigation { display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:#fff; border:1px solid var(--color-border); border-radius:10px; margin-bottom:22px; }
 .electric-navigation button { border:0; background:transparent; color:#35628c; padding:9px 13px; border-radius:6px; font-size:13px; cursor:pointer; }
-.electric-navigation button[aria-pressed=true] { background:#075ab8; color:white; }
+.electric-navigation button[aria-pressed=true] { background:var(--color-primary); color:white; }
 .electric-kpis,.electric-gauge-grid,.electric-meter-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
-.electric-kpis article { border:1px solid #d9e4f1; border-left:5px solid #075ab8; background:#fff; border-radius:12px; padding:20px 16px; display:grid; gap:12px; }
-.electric-kpis article:nth-child(2) { border-left-color:#80b600; }
-.electric-kpis span { text-transform:uppercase; color:#71859b; font-size:11px; }
-.electric-kpis strong { color:#064b8b; font-size:clamp(20px,2vw,29px); font-variant-numeric:tabular-nums; }
+.electric-kpis article { border:1px solid var(--color-border); border-left:5px solid var(--color-primary); background:#fff; border-radius:12px; padding:20px 16px; display:grid; gap:12px; }
+.electric-kpis article:nth-child(2) { border-left-color:var(--status-ok-indicator); }
+.electric-kpis span { text-transform:uppercase; color:var(--color-text-muted); font-size:11px; }
+.electric-kpis strong { color:var(--color-primary-strong); font-size:clamp(20px,2vw,29px); font-variant-numeric:tabular-nums; }
 .electric-gauge-grid { margin-top:20px; }
-.electric-gauge { background:white; border:1px solid #d9e4f1; border-radius:12px; padding:16px 12px; display:flex; flex-direction:column; align-items:center; }
+.electric-gauge { background:white; border:1px solid var(--color-border); border-radius:12px; padding:16px 12px; display:flex; flex-direction:column; align-items:center; }
 .electric-gauge svg { width:100%; max-width:270px; fill:none; stroke:#e6ecf3; stroke-width:20; stroke-linecap:round; }
-.electric-gauge strong { font-size:clamp(18px,2vw,27px); color:#064b8b; margin-top:-40px; }
-.electric-gauge span { text-transform:uppercase; color:#71859b; font-size:10px; margin-top:9px; text-align:center; }
+.electric-gauge strong { font-size:clamp(18px,2vw,27px); color:var(--color-primary-strong); margin-top:-40px; }
+.electric-gauge span { text-transform:uppercase; color:var(--color-text-muted); font-size:10px; margin-top:9px; text-align:center; }
 .electric-gauge small { font-size:9px; color:#8e9bac; margin-top:5px; }
-.electric-data-note { color:#71859b; font-size:11px; margin:12px 0 20px; line-height:1.5; }
-.electric-meter { border:1px solid #d9e4f1; border-top:4px solid #80b600; border-radius:12px; background:white; padding:18px; }
+.electric-data-note { color:var(--color-text-muted); font-size:11px; margin:12px 0 20px; line-height:1.5; }
+.electric-meter { border:1px solid var(--color-border); border-top:4px solid var(--status-ok-indicator); border-radius:12px; background:white; padding:18px; }
 .electric-meter.is-offline { border-top-color:#e73528; }
 .electric-meter header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
-.electric-meter header button { border:0; padding:0; background:transparent; color:#064b8b; font-weight:700; font-size:16px; cursor:pointer; text-align:left; }
-.electric-meter > p { color:#71859b; font-size:11px; line-height:1.5; margin:8px 0 18px; }
+.electric-meter header button { border:0; padding:0; background:transparent; color:var(--color-primary-strong); font-weight:700; font-size:16px; cursor:pointer; text-align:left; }
+.electric-meter > p { color:var(--color-text-muted); font-size:11px; line-height:1.5; margin:8px 0 18px; }
 .electric-meter dl { display:grid; grid-template-columns:1fr 1fr; gap:18px 10px; margin:0; }
-.electric-meter dt { color:#71859b; text-transform:uppercase; font-size:10px; }
+.electric-meter dt { color:var(--color-text-muted); text-transform:uppercase; font-size:10px; }
 .electric-meter dd { margin:5px 0 0; font-weight:700; font-size:18px; font-variant-numeric:tabular-nums; }
 .electrical-dashboard .portal-table-panel { margin-top:28px; }
 .electrical-dashboard .portal-table-panel th,.electrical-dashboard .portal-table-panel td { padding:15px 10px; }
-.electric-table-link { padding:0; border:0; background:none; color:#075ab8; text-decoration:underline; cursor:pointer; }
+.electric-table-link { padding:0; border:0; background:none; color:var(--color-primary); text-decoration:underline; cursor:pointer; }
 .electric-footer { color:#8093aa; text-align:center; font-size:12px; padding:32px 0 8px; }
 @media(max-width:1250px) { .electric-meter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .electric-gauge strong { margin-top:-28px; font-size:19px; } }
 @media(max-width:1000px) { .electric-kpis,.electric-gauge-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .electric-gauge strong { margin-top:-40px; font-size:24px; } }
 @media(max-width:480px) { .electric-kpis,.electric-meter-grid { grid-template-columns:1fr; } .electric-gauge strong { margin-top:-26px; font-size:18px; } .electric-heading h2 { font-size:22px; } }
 .meter-detail-status { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:0 0 20px; font-size:13px; }
-.meter-detail-status > span:nth-child(2) { margin-left:auto; background:#075ab8; color:white; padding:10px 18px; border-radius:7px; }
+.meter-detail-status > span:nth-child(2) { margin-left:auto; background:var(--color-primary); color:white; padding:10px 18px; border-radius:7px; }
 .harmonics-unavailable { color:#8798aa; }
 .detail-kpis { grid-template-columns:repeat(6,minmax(0,1fr)); }
 .detail-kpis strong { font-size:clamp(18px,1.7vw,28px); }
 .detail-kpis article { padding:18px 14px; }
-.detail-kpis article:nth-child(2) { border-left-color:#075ab8; }
+.detail-kpis article:nth-child(2) { border-left-color:var(--color-primary); }
 .meter-phase-panels,.meter-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; margin-top:22px; }
-.meter-phase-panels > section,.meter-chart-grid > section { min-width:0; background:white; border:1px solid #d9e4f1; border-radius:14px; padding:24px; box-shadow:0 2px 4px #15365605; }
-.meter-detail h3 { color:#064b8b; font-size:18px; margin:0 0 18px; }
+.meter-phase-panels > section,.meter-chart-grid > section { min-width:0; background:white; border:1px solid var(--color-border); border-radius:14px; padding:24px; box-shadow:0 2px 4px #15365605; }
+.meter-detail h3 { color:var(--color-primary-strong); font-size:18px; margin:0 0 18px; }
 .meter-phase-panels dl { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:0; }
 .meter-phase-panels dl > div { background:#e9f0fb; border-radius:9px; padding:15px; }
-.meter-phase-panels dt { color:#71859b; font-size:12px; }
-.meter-phase-panels dd { color:#064b8b; margin:5px 0 0; font-size:clamp(17px,1.6vw,24px); font-weight:700; }
-.meter-periods { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:24px; color:#71859b; font-size:14px; }
-.meter-periods button { padding:9px 15px; background:white; border:1px solid #d9e4f1; border-radius:7px; color:#064b8b; cursor:pointer; }
-.meter-periods button[aria-pressed=true] { background:#075ab8; color:white; border-color:#075ab8; }
+.meter-phase-panels dt { color:var(--color-text-muted); font-size:12px; }
+.meter-phase-panels dd { color:var(--color-primary-strong); margin:5px 0 0; font-size:clamp(17px,1.6vw,24px); font-weight:700; }
+.meter-periods { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:24px; color:var(--color-text-muted); font-size:14px; }
+.meter-periods button { padding:9px 15px; background:white; border:1px solid var(--color-border); border-radius:7px; color:var(--color-primary-strong); cursor:pointer; }
+.meter-periods button[aria-pressed=true] { background:var(--color-primary); color:white; border-color:var(--color-primary); }
 .meter-periods small { margin-left:auto; font-size:11px; }
 .meter-chart-grid { margin-top:14px; }
 .meter-chart { height:280px; }

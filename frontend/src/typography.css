@@ -5,7 +5,7 @@
   font-display: swap;
   src: url('/fonts/inter-latin-variable.woff2') format('woff2');
 }
-:root { --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+/* --font-ui y --font-display se definen en design-system/tokens.css */
 body, button, input, select, textarea { font-family: var(--font-ui); }
 svg text, .nutrial-hmi .nutrial-diagram { font-family: var(--font-ui); }
 table, .reading, .trend-current, .nutrial-readings { font-variant-numeric: tabular-nums; }
@@ -35,7 +35,7 @@ body .project-portal .electrical-dashboard .portal-table-panel tbody th small {
   line-height: 1.3;
   margin-top: 3px;
   font-weight: 400;
-  color: #728399;
+  color: var(--color-text-muted);
 }
 body .project-portal .electric-table-link { font-size: 13px; font-weight: 600; line-height: 1.4; padding: 3px 0; }
 body .project-portal .portal-table-panel :is(.meter-online,.meter-offline) { padding: 3px 7px; font-size: 11px; line-height: 1.3; }
