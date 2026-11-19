@@ -1,0 +1,170 @@
+/* Identidad visual compartida del acceso y del portal. */
+.access-landing,.project-portal {
+ --brand-blue:#0058bc; --brand-deep:#003e82; --brand-green:#81b900;
+ --surface-shadow:0 5px 16px rgb(21 65 112 / 7%),0 1px 3px rgb(21 65 112 / 4%);
+ font-family:var(--font-ui);
+}
+.access-landing { background:radial-gradient(ellipse at 50% 30%,#e8f0fb 0%,#f3f6fa 66%); padding-top:28px; }
+.access-card { max-width:500px; box-shadow:0 20px 55px #1a51811a,0 2px 8px #1a518108; border-color:#d8e4f2; }
+.access-brand { background:linear-gradient(115deg,#003e82,#0058bc); padding:30px 28px; min-height:205px; justify-content:center; }
+.access-brand svg { width:57px; height:57px; margin-bottom:17px; stroke-width:2.4; }
+.access-brand h1 { font-size:40px; font-weight:650; letter-spacing:-1px; }
+.access-brand p { font-size:15px; color:#e2edff; }
+.access-form-area { padding:32px 35px 35px; }
+.access-card h2 { font-size:29px; font-weight:700; }
+.access-card .access-form-subtitle { font-size:16px; color:#627c98; }
+.access-card .firebase-login { gap:21px; }
+.access-card .firebase-login label { font-size:15px; color:#52708e; }
+.access-card input { min-height:49px; border-color:#cddced; box-shadow:inset 0 1px 2px #1b477306; }
+.access-card button { min-height:51px; font-size:17px; background:#0058bc; box-shadow:0 4px 10px #0058bc20; }
+.access-footer { padding:30px 0 8px; color:#617e9c; font-size:14px; }
+.project-portal { background:#f1f5fa; }
+.project-portal .portal-header { background:linear-gradient(105deg,#003e82,#005bbd); color:white; border-bottom:4px solid var(--brand-green); box-shadow:0 3px 10px #164c8120; min-height:78px; }
+.project-portal .portal-header strong { font-size:21px; font-weight:650; }
+.project-portal .portal-header > div > span { color:#e3efff; font-size:13px; background:#ffffff17; padding:6px 10px; border-radius:20px; }
+.project-portal .portal-header button,.project-portal .portal-header a { color:white; border:1px solid #ffffff60; padding:8px 13px; border-radius:7px; font-size:13px; text-decoration:none; background:#ffffff0d; }
+.project-portal .portal-header button:hover,.project-portal .portal-header a:hover { background:#ffffff24; }
+.project-portal .portal-sidebar { box-shadow:3px 0 16px #17437106; border-right-color:#dbe5ef; }
+.project-portal .portal-brand { padding-bottom:25px; color:#06488d; font-size:14px; }
+.project-portal .portal-brand > span { background:linear-gradient(135deg,#00458e,#0878dc); box-shadow:0 5px 12px #0058bc25; width:46px; height:46px; }
+.project-portal .portal-brand small { color:#647e98; font-size:11px; }
+.project-portal .portal-menu button { padding:12px; font-size:14px; min-height:47px; color:#526e8a; transition:background .15s,color .15s; }
+.project-portal .portal-menu button:hover { color:#0058bc; background:#edf4ff; }
+.project-portal .portal-menu button[aria-current=page] { background:#0058bc; color:white; border-color:#0058bc; box-shadow:0 4px 10px #0058bc22; }
+.project-portal .portal-menu-heading { color:#70869c; font-size:11px; }
+.project-portal .portal-content { padding-top:30px; }
+.project-portal .portal-intro h1 { color:#004789; font-weight:700; }
+.project-portal .portal-intro p { color:#657e98; font-size:15px; }
+.project-portal .portal-intro .portal-eyebrow { color:#0058bc; font-size:11px; }
+.project-portal .portal-summary > div,.project-portal .project-card,.project-portal .portal-table-panel { box-shadow:var(--surface-shadow); border-color:#d7e3f1; }
+.project-portal .portal-summary > div { border-left:4px solid #0058bc; padding:19px 21px; }
+.project-portal .portal-summary strong { font-size:22px; color:#004789; }
+.project-portal .portal-summary span { font-size:13px; color:#647e98; }
+.project-portal .portal-section-heading h2 { color:#004789; font-size:21px; }
+.project-portal .project-card { border-radius:14px; transition:box-shadow .18s,transform .18s; }
+.project-portal .project-card:hover { transform:translateY(-3px); box-shadow:0 12px 27px #124c8819; }
+.project-portal .project-card > img { border-bottom:3px solid #0058bc; }
+.project-portal .project-card h2 { font-size:24px; color:#004789; margin-top:15px; }
+.project-portal .project-card p { color:#647e98; font-size:14px; line-height:1.6; }
+.project-portal .project-card-content { padding:22px; }
+.project-portal .project-card button { background:#0058bc; font-size:14px; padding:12px 14px; box-shadow:0 3px 8px #0058bc18; border-radius:8px; }
+.project-portal .project-card button:hover { background:#004a9f; }
+.project-portal .project-status { color:#32649a; background:#eef5ff; border-color:#cddff4; padding:5px 9px; }
+.project-portal .portal-table-panel h2 { color:#004789; font-size:20px; }
+.project-portal .portal-table-panel thead { background:#e6effb; color:#50749a; }
+.project-portal .portal-table-panel table { font-size:13px; }
+.project-portal .portal-table-panel tbody tr:hover { background:#f5f9ff; }
+.project-portal .meter-online { background:#edf6d8; color:#497b00; }
+.project-portal .meter-offline { background:#fde9e6; color:#c43b30; }
+.project-portal .electrical-dashboard .electric-heading h2 { font-size:28px; color:#004789; }
+.project-portal .electric-heading p { font-size:15px; color:#647e98; }
+.project-portal .electric-navigation { background:linear-gradient(105deg,#00468f,#005bbd); border-color:#0058bc; box-shadow:0 4px 12px #0058bc19; border-bottom:3px solid #81b900; padding:9px; gap:5px; }
+.project-portal .electric-navigation button { color:#e3efff; font-size:14px; padding:11px 14px; }
+.project-portal .electric-navigation button:hover { background:#ffffff1c; }
+.project-portal .electric-navigation button[aria-pressed=true] { background:white; color:#0051a6; box-shadow:0 2px 6px #003b7824; font-weight:600; }
+.project-portal .electric-kpis article,.project-portal .electric-gauge,.project-portal .electric-meter,.project-portal .meter-phase-panels > section,.project-portal .meter-chart-grid > section { box-shadow:var(--surface-shadow); border-color:#d7e3f1; }
+.project-portal .electric-kpis article { border-left-color:#0058bc; padding:22px 17px; }
+.project-portal .electric-kpis:not(.detail-kpis) article:nth-child(2) { border-left-color:#81b900; }
+.project-portal .electric-kpis span { color:#647e98; font-size:12px; line-height:1.5; }
+.project-portal .electric-kpis strong { color:#004789; font-size:clamp(23px,2vw,31px); letter-spacing:-.5px; }
+.project-portal .electric-gauge { padding:20px 14px; }
+.project-portal .electric-gauge strong { color:#004789; font-size:clamp(21px,2vw,29px); }
+.project-portal .electric-gauge span { font-size:12px; color:#647e98; }
+.project-portal .electric-gauge small { font-size:10px; }
+.project-portal .electric-meter { border-top-color:#81b900; padding:20px; }
+.project-portal .electric-meter.is-offline { border-top-color:#ed3d30; }
+.project-portal .electric-meter header button { font-size:18px; }
+.project-portal .electric-meter header button:hover { text-decoration:underline; }
+.project-portal .electric-meter > p { font-size:12px; color:#647e98; }
+.project-portal .electric-meter dt { font-size:11px; color:#647e98; }
+.project-portal .electric-meter dd { font-size:21px; color:#173956; }
+.project-portal .detail-kpis strong { font-size:clamp(20px,1.7vw,28px); }
+.project-portal .meter-detail h3 { font-size:20px; }
+.project-portal .meter-phase-panels dl > div { background:#e7effb; border:1px solid #e0eafb; box-shadow:inset 0 1px 0 #ffffffb0; padding:17px; }
+.project-portal .meter-phase-panels dt { color:#647e98; font-size:13px; }
+.project-portal .meter-phase-panels dd { color:#004789; font-size:clamp(20px,1.7vw,26px); }
+.project-portal .meter-periods button { box-shadow:0 2px 4px #164c8108; }
+.project-portal .meter-periods button[aria-pressed=true] { background:#0058bc; box-shadow:0 3px 8px #0058bc20; }
+.project-portal .electric-data-note,.project-portal .meter-chart-empty { font-size:12px; color:#647e98; }
+@media(max-width:1250px) { .project-portal .electric-gauge strong { font-size:20px; } .project-portal .portal-summary strong { font-size:18px; } }
+@media(max-width:740px) { .project-portal .portal-header strong { font-size:17px; } .project-portal .portal-content { padding-top:20px; } .project-portal .portal-menu button { padding:8px 10px; min-height:40px; font-size:13px; } .project-portal .electric-navigation button { font-size:13px; padding:9px 10px; } }
+@media(max-width:480px) { .access-brand { min-height:180px; padding:23px; } .access-brand h1 { font-size:35px; } .access-form-area { padding:26px 23px; } .access-card h2 { font-size:25px; } .project-portal .electric-gauge span { font-size:10px; } .project-portal .meter-phase-panels dl > div { padding:12px; } }
+@media(max-height:740px) { .access-brand { min-height:150px; padding:20px; } .access-brand svg { width:38px; height:38px; margin-bottom:10px; } .access-brand h1 { font-size:34px; } .access-form-area { padding-top:23px; padding-bottom:25px; } .access-card .firebase-login { gap:16px; } }
+@media(prefers-reduced-motion:reduce) { .project-portal .project-card,.project-portal .portal-menu button { transition:none; } .project-portal .project-card:hover { transform:none; } }
+.project-live-summary{margin:0 0 20px;font-size:12px}.project-live-summary>div{border-top:1px solid #e3ebf4;padding:9px 0}.project-live-summary dt{color:#60778f}.project-live-summary dd{margin:4px 0 0;color:#164b7d;line-height:1.5}.portal-notice{padding:18px;background:#fff4dc;color:#6b4d10;border:1px solid #ecd49d;border-radius:8px;line-height:1.5}.access-card .password-recovery{background:transparent;color:#075bb9;border:0;box-shadow:none;min-height:32px;padding:3px;font-size:14px}.portal-water{background:#092333;color:#f3f6f9;border-radius:12px;overflow:auto}.portal-water .app-shell{height:auto;min-width:760px;display:block}.portal-water .app-shell>.header{display:none}.portal-water .app-shell>main{min-height:400px;overflow:visible}.portal-water .app-shell .process-svg{height:auto;min-height:300px;flex:none}.portal-water .app-shell .panel h2{font-size:20px;height:45px}.portal-water .app-shell .reading{font-size:26px}.portal-water .app-shell .variable-label b{font-size:19px}.portal-water .app-shell .variable-label span{font-size:13px}.portal-water .app-shell .state-row{font-size:12px}.portal-water .demo-strip{height:auto;min-height:32px;flex-wrap:wrap}.portal-water .project-session-bar>button:last-child{display:none}
+/* Tendencias dentro del portal: el contenedor tiene altura natural, no la de
+   la antigua HMI a pantalla completa. No comprimir las tarjetas con flex. */
+.portal-water .app-shell > .trends-screen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(240px, 1.15fr) repeat(2, minmax(215px, 1fr));
+  min-height: max(740px, calc(100dvh - 285px));
+  gap: 14px;
+  padding: 12px 18px 6px;
+  overflow: visible;
+}
+.portal-water .app-shell .trends-toolbar {
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  min-height: 58px;
+  padding: 10px 16px;
+  margin: 0;
+}
+.portal-water .app-shell .trends-toolbar h2 { font-size: 28px; }
+.portal-water .app-shell .trend-card,
+.portal-water .app-shell .trend-level {
+  display: grid;
+  grid-template-rows: auto minmax(170px, 1fr);
+  flex: none;
+  height: auto;
+  min-height: 215px;
+  padding: 14px 18px;
+  gap: 12px;
+}
+.portal-water .app-shell .trend-level { min-height: 240px; }
+.portal-water .app-shell .trend-card h3 {
+  height: auto;
+  min-height: 30px;
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.3;
+  gap: 14px;
+}
+.portal-water .app-shell .trend-card-body {
+  height: auto;
+  min-height: 170px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  gap: 24px;
+}
+.portal-water .app-shell .trend-plot { min-height: 170px; padding-left: 45px; }
+.portal-water .app-shell .trend-axis-title { font-size: 16px; top: 45%; }
+.portal-water .app-shell .trend-current {
+  padding-left: 24px;
+  margin: 0;
+  gap: 8px;
+  justify-content: center;
+}
+.portal-water .app-shell .trend-current > strong { font-size: 36px; }
+.portal-water .app-shell .trend-current > span,
+.portal-water .app-shell .trend-volume > span { font-size: 17px; }
+.portal-water .app-shell .trend-volume { margin-top: 5px; padding-top: 10px; }
+.portal-water .app-shell .trend-volume strong { font-size: 29px; }
+.portal-water .app-shell .trend-volume > div { flex-wrap: wrap; gap: 4px 10px; }
+.portal-water .app-shell .trend-volume > div > span { font-size: 15px; }
+.portal-content:has(.trends-screen) > .portal-intro { margin-bottom: 16px; }
+@media (max-width: 1100px) {
+  .portal-water .app-shell .trend-card-body { grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; }
+  .portal-water .app-shell .trend-current { padding-left: 16px; }
+  .portal-water .app-shell .trend-current > strong { font-size: 30px; }
+}
+@media (max-width: 740px) {
+  .portal-water:has(.trends-screen) .app-shell { min-width: 0; }
+  .portal-water .app-shell > .trends-screen { grid-template-rows: auto; min-height: 0; padding: 10px; }
+  .portal-water .app-shell .trend-card-body { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+  .portal-water .app-shell .trend-plot { height: 210px; }
+  .portal-water .app-shell .trend-current { border-left: 0; border-top: 1px solid #52758a; padding: 12px 0 0; }
+  .portal-water .app-shell .trend-card h3 { font-size: 19px; }
+  .portal-water .app-shell .trend-updated { white-space: normal; margin-left: 0; border-left: 0; padding-left: 0; }
+  .portal-water .app-shell .period-selector { flex-wrap: wrap; gap: 8px; }
+  .portal-water .app-shell .period-selector button { min-width: 48px; font-size: 16px; padding: 8px; }
+}

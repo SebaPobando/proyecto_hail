@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-variable.woff2') format('woff2');
+}
+:root { --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+body, button, input, select, textarea { font-family: var(--font-ui); }
+svg text, .nutrial-hmi .nutrial-diagram { font-family: var(--font-ui); }
+table, .reading, .trend-current, .nutrial-readings { font-variant-numeric: tabular-nums; }
+/* Densidad uniforme para tablas de consulta, sin reducir el área de formularios. */
+body .project-portal :is(.portal-table-panel,.ops-table,.report-result,.nutrial-hmi) table {
+  font-size: 13px;
+  line-height: 1.4;
+}
+body .project-portal :is(.portal-table-panel,.ops-table,.report-result,.nutrial-hmi) :is(th,td) {
+  padding: 9px 12px;
+  height: auto;
+  vertical-align: middle;
+}
+body .project-portal :is(.portal-table-panel,.ops-table,.report-result,.nutrial-hmi) thead th {
+  padding-block: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+body .project-portal .portal-table-panel { padding: 16px; border-radius: 9px; }
+body .project-portal .portal-table-panel h2 { font-size: 18px; margin: 0 0 14px; font-weight: 650; }
+body .project-portal .electrical-dashboard .portal-table-panel :is(td,th):nth-child(n+3) { text-align: right; }
+body .project-portal .electrical-dashboard .portal-table-panel tbody th { min-width: 175px; }
+body .project-portal .electrical-dashboard .portal-table-panel tbody th small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.3;
+  margin-top: 3px;
+  font-weight: 400;
+  color: #728399;
+}
+body .project-portal .electric-table-link { font-size: 13px; font-weight: 600; line-height: 1.4; padding: 3px 0; }
+body .project-portal .portal-table-panel :is(.meter-online,.meter-offline) { padding: 3px 7px; font-size: 11px; line-height: 1.3; }
+body .project-portal .report-result :is(td,th):not(:first-child) { text-align: right; }
+body .project-portal .ops-table td button { padding: 6px 10px; }
+@media (pointer:coarse) {
+  body .project-portal .electric-table-link { min-height: 36px; }
+  body .project-portal .ops-table td button { min-height: 36px; }
+}

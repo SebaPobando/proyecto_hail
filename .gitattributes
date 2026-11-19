@@ -1,0 +1,12 @@
+# Normaliza finales de línea en el repositorio (LF) y deja que Git use CRLF
+# en Windows al hacer checkout si core.autocrlf lo pide.
+* text=auto
+
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.sh  text eol=lf
+
+*.jpg   binary
+*.png   binary
+*.woff2 binary
+*.ico   binary

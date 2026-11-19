@@ -1,0 +1,175 @@
+body:has(.project-portal) { min-width: 0; }
+.project-portal { min-height: 100svh; background: #f4f7fb; color: #17324d; }
+.portal-header {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 17px clamp(18px, 3vw, 42px);
+  border-bottom: 1px solid #e1e7ef; background: #ffffff;
+}
+.portal-header strong { font-size: clamp(16px, 2.3vw, 22px); }
+.portal-header > div { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; }
+.portal-header button, .project-back {
+  border: 1px solid #6c94aa; border-radius: 6px; padding: 5px 10px;
+  color: inherit; background: transparent; cursor: pointer;
+}
+.portal-content {
+  display: block; min-width: 0;
+  padding: clamp(22px, 3vw, 46px) clamp(18px, 3vw, 42px);
+}
+.portal-layout {
+  display: grid; grid-template-columns: clamp(204px, 17vw, 254px) minmax(0, 1fr);
+  min-height: calc(100svh - 70px);
+}
+.portal-sidebar {
+  min-width: 0; border-right: 1px solid #e1e7ef; padding: 22px 13px;
+  background: #ffffff;
+}
+.portal-sidebar .portal-menu {
+  position: sticky; top: 16px; display: flex; flex-direction: column; gap: 4px;
+  height: auto; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent;
+}
+.portal-menu button {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+  flex: none; padding: 10px; min-height: 42px; border: 1px solid transparent;
+  border-radius: 7px; color: #52677e; background: transparent; font-size: 15px;
+  text-align: left; cursor: pointer;
+}
+.portal-menu button:last-child { border-right: 1px solid transparent; }
+.portal-menu button svg { flex: none; }
+.portal-menu button:hover { background: #f1f5fb; }
+.portal-menu button[aria-current="page"] {
+  border-color: #dce9fb; border-radius: 7px; background: #eaf2ff; color: #fff;
+}
+.portal-menu-heading {
+  margin: 15px 10px 3px; padding-top: 11px; border-top: 1px solid #e1e7ef;
+  color: #8090a3; font-size: 12px; font-weight: 600;
+}
+.portal-intro { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 18px 0 26px; }
+.portal-intro h1 { margin: 0; font-size: clamp(32px, 5vw, 56px); line-height: 1.05; }
+.portal-intro p { margin: 6px 0; color: #708297; line-height: 1.5; }
+.project-grid, .meter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.project-card, .meter-card, .nutrial-overview, .electrical-kpis > div {
+  background: #ffffff; border: 1px solid #dfe7f0; border-radius: 12px; overflow: hidden;
+}
+.project-card { display: flex; flex-direction: column; }
+.project-card > img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #13364a; }
+.project-card-content { display: flex; flex-direction: column; flex: 1; padding: clamp(16px, 2vw, 24px); }
+.project-card-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; align-items: center; color: #708297; font-size: 13px; }
+.project-status { border: 1px solid #dce6f2; border-radius: 12px; padding: 3px 8px; color: #52718d; font-size: 12px; }
+.project-card h2 { margin: 12px 0 4px; font-size: clamp(20px, 2vw, 26px); }
+.project-card p, .meter-card p, .nutrial-overview p { color: #708297; line-height: 1.45; }
+.project-card p { margin: 4px 0 18px; }
+.project-card button {
+  display: flex; justify-content: space-between; gap: 10px; margin-top: auto;
+  border: 1px solid #1764c0; border-radius: 6px; padding: 9px 12px;
+  background: #1764c0; color: white; cursor: pointer; text-align: left;
+}
+.project-card button:hover, .project-back:hover, .portal-header button:hover { background: #134e99; }
+.project-session-bar { display: flex; gap: 12px; align-items: center; }
+.project-session-bar .project-back { padding-block: 1px; }
+.electrical-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.electrical-kpis > div { display: grid; gap: 9px; padding: 15px; border-top: 3px solid #3595c3; }
+.electrical-kpis strong { font-size: clamp(20px, 2.5vw, 30px); }
+.electrical-kpis span, .meter-card dt { color: #73859a; font-size: 13px; }
+.portal-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 20px 0 12px; }
+.portal-section-heading h2 { margin: 0; }
+.portal-section-heading select { font: inherit; margin-left: 6px; padding: 5px; border: 1px solid #7ca3b7; border-radius: 5px; }
+.meter-card, .nutrial-overview { padding: 16px; }
+.meter-card header { display: flex; align-items: start; flex-wrap: wrap; justify-content: space-between; gap: 6px; }
+.meter-card h3, .nutrial-overview h2 { margin: 0; }
+.meter-card p { margin: 5px 0 12px; }
+.meter-online, .meter-offline { border-radius: 12px; padding: 3px 7px; font-size: 12px; }
+.meter-online { background: #eaf5dc; color: #427520; }
+.meter-offline { background: #fff0ed; color: #b63f38; }
+.meter-card dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+.meter-card dd { margin: 3px 0 0; font-weight: 700; }
+.nutrial-overview img { display: block; width: min(100%, 740px); margin: auto; border-radius: 6px; }
+.nutrial-overview ol { display: flex; flex-wrap: wrap; gap: 8px 34px; }
+@media(max-width: 1020px) {
+  .project-grid, .meter-grid, .electrical-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media(max-width: 740px) {
+  .portal-layout { grid-template-columns: minmax(0, 1fr); }
+  .portal-sidebar { padding: 9px 14px; border-right: 0; border-bottom: 1px solid #e1e7ef; }
+  .portal-sidebar .portal-menu { position: static; flex-direction: row; flex-wrap: wrap; }
+  .portal-menu button { min-height: 35px; padding: 5px 8px; }
+  .portal-menu-heading { display: none; }
+}
+@media(max-width: 530px) {
+  .project-grid, .meter-grid { grid-template-columns: 1fr; }
+}
+
+/* Portal claro: independiente de la HMI industrial. */
+.project-portal { color-scheme: light; font-family:var(--font-ui); }
+.project-portal button:focus-visible, .project-portal select:focus-visible, .project-portal a:focus-visible { outline: 3px solid #ed9d37; outline-offset: 3px; }
+.portal-header { margin-left: 244px; min-height: 72px; padding: 16px 30px; }
+.portal-header strong { font-size: 18px; }
+.portal-header > div > span { font-size: 12px; color: #748599; }
+.portal-header a { color: #1764c0; font-size: 13px; }
+.portal-layout { grid-template-columns: 244px minmax(0,1fr); min-height: calc(100svh - 72px); }
+.portal-sidebar { position: fixed; inset: 0 auto 0 0; width: 244px; display: flex; flex-direction: column; gap: 28px; padding: 24px 16px; z-index: 5; }
+.portal-content { grid-column: 2; padding: 25px 30px 40px; }
+.portal-brand { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 13px; letter-spacing: .8px; padding-bottom: 22px; border-bottom: 1px solid #e7edf4; }
+.portal-brand > span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; background: #0753a5; color: white; font-size: 19px; }
+.portal-brand small, .sidebar-footer small { display: block; margin-top: 5px; font-size: 10px; font-weight: 400; letter-spacing: 0; color: #8090a3; }
+.portal-sidebar .portal-menu { position: static; }
+.portal-menu button { font-size: 13px; min-height: 46px; }
+.portal-menu button[aria-current="page"] { color: #0753a5; font-weight: 650; box-shadow: inset 3px 0 #1764c0; }
+.portal-menu-heading { text-transform: uppercase; font-size: 10px; letter-spacing: 1.3px; margin-top: 20px; padding-top: 22px; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid #e7edf4; padding-top: 22px; display: flex; gap: 9px; align-items: center; font-size: 12px; }
+.sidebar-avatar { border-radius: 50%; background: #eaf2ff; color: #1764c0; padding: 10px; font-weight: 700; }
+.portal-intro { margin: 5px 0 24px; }
+.portal-intro h1 { font-size: clamp(26px, 2.5vw, 36px); letter-spacing: -.8px; line-height: 1.25; }
+.portal-intro p { font-size: 14px; }
+.portal-intro .portal-eyebrow, .portal-eyebrow { color: #1764c0; font-size: 10px; letter-spacing: 1.6px; font-weight: 700; margin-bottom: 9px; }
+.portal-summary { display: grid; grid-template-columns: .8fr 1.4fr 1fr; gap: 16px; margin-bottom: 28px; }
+.portal-summary > div { background: white; border: 1px solid #dfe7f0; border-radius: 10px; padding: 17px 20px; display: grid; gap: 10px; border-left: 3px solid #1764c0; }
+.portal-summary span { color: #708297; font-size: 12px; }
+.portal-summary strong { color: #124a85; font-size: 20px; }
+.portal-section-heading h2, .portal-table-panel h2, .nutrial-overview h2 { font-size: 18px; }
+.portal-section-heading > span { font-size: 12px; color: #708297; }
+.project-card { box-shadow: 0 3px 10px #16324d04; }
+.project-card > img { aspect-ratio: 16 / 9; }
+.project-card-content { padding: 19px; }
+.project-card h2 { font-size: 22px; }
+.project-card p { font-size: 13px; min-height: 58px; }
+.project-card-meta { font-size: 11px; }
+.project-status { background: #f3f7fc; font-size: 10px; white-space: nowrap; }
+.project-card button { font-size: 13px; padding: 11px 13px; }
+.portal-table-panel { background: white; border: 1px solid #dfe7f0; border-radius: 12px; padding: 20px; margin-top: 24px; }
+.portal-table-panel h2 { margin: 0 0 18px; }
+.portal-table-scroll { overflow-x: auto; }
+.portal-table-panel table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.portal-table-panel th, .portal-table-panel td { padding: 14px 12px; border-bottom: 1px solid #e7edf4; white-space: nowrap; }
+.portal-table-panel thead { background: #edf3fb; color: #607b98; }
+.portal-table-panel tbody th { color: #17558f; font-weight: 600; }
+.portal-table-panel small { display: block; color: #8190a2; font-weight: 400; margin-top: 5px; }
+.electrical-gauges { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+.electrical-gauges article { position: relative; background: white; border: 1px solid #dfe7f0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; }
+.electrical-gauges svg { width: min(100%,240px); height: 120px; fill: none; stroke: #e6edf5; stroke-width: 18; stroke-linecap: round; }
+.electrical-gauges svg path + path { stroke: #1764c0; }
+.electrical-gauges article:first-child svg path + path { stroke: #ed941b; }
+.electrical-gauges strong { margin-top: -40px; font-size: 26px; color: #0d4d91; }
+.electrical-gauges span { font-size: 11px; color: #73859a; margin-top: 8px; }
+.meter-card { border-top: 3px solid #7bad2b; }
+.meter-card:has(.meter-offline) { border-top-color: #dc544b; }
+.meter-card h3 { font-size: 16px; color: #0d4d91; }
+.meter-card p { font-size: 11px; }
+.meter-card dt { font-size: 11px; }
+.electrical-kpis strong { font-size: clamp(18px,2vw,27px); color: #0d4d91; }
+.nutrial-overview { margin-top: 22px; }
+.nutrial-overview .portal-section-heading { margin-top: 0; }
+.nutrial-overview p { font-size: 13px; }
+.nutrial-overview img { width: min(100%,860px); }
+.stage-tabs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-top: 20px; }
+.stage-tabs button { display: flex; align-items: center; gap: 10px; background: #f7f9fc; color: #52677e; border: 1px solid #dfe7f0; border-radius: 8px; padding: 13px; text-align: left; cursor: pointer; font-size: 12px; }
+.stage-tabs button[aria-selected="true"] { border-color: #1764c0; color: #0753a5; background: #eaf2ff; }
+.stage-tabs button span { font-size: 20px; font-weight: 700; }
+.nutrial-detail { margin-top: 20px; background: white; border: 1px solid #dfe7f0; border-radius: 12px; padding: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.nutrial-detail h2 { margin: 8px 0; font-size: 21px; }
+.nutrial-detail p { color: #708297; font-size: 13px; line-height: 1.5; }
+.nutrial-detail dl { margin: 0; }
+.nutrial-detail dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid #e7edf4; font-size: 13px; }
+.nutrial-detail dd { color: #8090a3; }
+@media(min-width:1600px) { .portal-content { padding: 32px 44px; } .project-card > img { max-height: 250px; } }
+@media(max-width:1100px) { .portal-header { margin-left: 210px; } .portal-sidebar { width: 210px; } .portal-layout { grid-template-columns: 210px minmax(0,1fr); } .portal-content { padding: 22px; } .portal-summary { grid-template-columns: 1fr; gap: 8px; } .portal-summary > div { display:flex; justify-content:space-between; align-items:center; } .portal-summary strong { font-size: 16px; } .stage-tabs { grid-template-columns: 1fr 1fr; } }
+@media(max-width:740px) { .portal-header { margin-left:0; padding:16px; } .portal-layout { display:block; } .portal-sidebar { position:static; width:auto; padding:12px 16px; display:block; } .portal-brand,.sidebar-footer { display:none; } .portal-sidebar .portal-menu { gap: 4px; } .portal-menu button { font-size:12px; min-height:38px; } .portal-content { padding:20px 16px; } .electrical-gauges { grid-template-columns:1fr; } .nutrial-detail { grid-template-columns:1fr; } }

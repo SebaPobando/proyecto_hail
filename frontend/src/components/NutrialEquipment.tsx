@@ -1,0 +1,17 @@
+import { useState } from 'react';
+import signals from '../services/nutrialSignals.json';
+import { downloadCsv } from '../services/exportCsv';
+export const equipment = [['TC-01','Tecle eléctrico'],['BB-01','Descargador big bag'],['TZ-01','Tamizador 1'],['TZ-02','Tamizador 2'],['ES-01','Esclusa 1'],['ES-02','Esclusa 2'],['ES-03','Esclusa superior'],['DH-01','Deshumidificador'],['SP-01','Soplador'],['MZ-01','Mezcladora'],['EN-01','Ensacadora']];
+const normalize=(value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+export function filterSignals(equipmentId:string,type:string,search:string){return signals.filter(s=>(equipmentId==='all'||s.description.includes(equipmentId)||s.tag.includes(equipmentId.replace('-','')))&&(type==='all'||s.type===type)&&normalize([s.tag,s.description,s.address,s.device,s.module].join(' ')).includes(normalize(search.trim())));}
+export default function NutrialEquipment({initialEquipment='all'}:{initialEquipment?:string}){
+ const [selected,setSelected]=useState(initialEquipment);const [type,setType]=useState('all');const [search,setSearch]=useState('');
+ const rows=filterSignals(selected,type,search);
+ const group=filterSignals(selected,'all','');
+ return <section className="nutrial-equipment">
+ <div className="nutrial-equipment-filters"><label>Equipo<select value={selected} onChange={e=>setSelected(e.target.value)}><option value="all">Todos · incluye señales generales</option>{equipment.map(([id,name])=><option key={id} value={id}>{id} · {name}</option>)}</select></label><label>Tipo de señal<select value={type} onChange={e=>setType(e.target.value)}><option value="all">Todos</option>{['DI','DO','AI','AO'].map(t=><option key={t}>{t}</option>)}</select></label><label>Buscar<input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tag, descripción, dirección o módulo"/></label><button onClick={()=>{setSelected('all');setType('all');setSearch('')}}>Limpiar filtros</button></div>
+ <section className="nutrial-panel"><h3>{selected==='all'?'Inventario de señales':`${selected} · ${equipment.find(e=>e[0]===selected)?.[1]}`}</h3><div className="nutrial-equipment-profile"><p>Lista de E/S · Rev. A · CPU Siemens S7-1200</p><div>{['DI','DO','AI','AO'].map(t=><span key={t}>{t}: <b>{group.filter(s=>s.type===t).length}</b></span>)}</div><p>Referencia de ingeniería. Las direcciones y salidas se consultan sin enviar comandos. Los valores de campo aún no están conectados.</p></div></section>
+ <div className="nutrial-equipment-results"><span role="status">{rows.length} señales encontradas</span><button disabled={!rows.length} onClick={()=>downloadCsv(`nutrial-senales-${selected}.csv`,[['Fuente','Lista E/S Nutrial Rev. A; referencia de ingeniería'],['Tag','Tipo','Dirección','Descripción','Módulo','Elemento','Lógica'],...rows.map(s=>[s.tag,s.type,s.address,s.description,s.module,s.device,s.logic])])}>Exportar selección CSV</button></div>
+ <div className="nutrial-panel nutrial-table-scroll" tabIndex={0} role="region" aria-label="Señales de Nutrial"><table><thead><tr><th>Tag / dirección</th><th>Tipo</th><th>Descripción</th><th>Módulo / elemento</th><th>Lógica</th></tr></thead><tbody>{rows.map(s=><tr key={s.tag}><td><strong>{s.tag}</strong><small>{s.address}</small></td><td>{s.type}</td><td>{s.description}</td><td>{s.module}<small>{s.device}</small></td><td>{s.logic||'—'}</td></tr>)}{rows.length===0&&<tr><td colSpan={5}>No hay señales que coincidan con los filtros.</td></tr>}</tbody></table></div>
+ </section>;
+}

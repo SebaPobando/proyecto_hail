@@ -1,0 +1,59 @@
+/* Navegación compartida y contenido con altura estable entre pantallas. */
+.hmi-navigation { display:flex; flex-wrap:wrap; gap:10px; padding:12px; margin:0; }
+.hmi-navigation button { flex:1; min-width:125px; min-height:44px; padding:10px 16px; border:1px solid #52778d; border-radius:5px; color:#e6f1f7; background:#163d53; font:inherit; font-size:15px; cursor:pointer; }
+.hmi-navigation button:hover { background:#20506b; }
+.hmi-navigation button[aria-pressed=true] { background:#126699; border-color:#49b7eb; }
+.hmi-navigation button:focus-visible { outline:2px solid #a8e1fa; outline-offset:2px; }
+.hmi-screen-content { min-height:max(740px,calc(100dvh - 245px)); }
+.portal-water .water-hmi,.water-hmi { display:block; height:auto; }
+.water-hmi .hmi-screen-content > main:has(.process-panel) { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; padding:0 14px 16px; }
+.water-hmi .hmi-screen-content > main > aside { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; overflow:visible; }
+.water-hmi .hmi-screen-content .process-panel { display:block; }
+.water-hmi .hmi-screen-content .process-svg { width:100%; height:auto; min-height:0; display:block; }
+.portal-water .water-hmi .hmi-screen-content .process-svg { height:auto; min-height:0; }
+.water-hmi .hmi-screen-content .panel-body { padding:14px; gap:10px; }
+.water-hmi .hmi-screen-content .variable-row,.water-hmi .hmi-screen-content .state-row { min-height:64px; }
+.water-hmi .hmi-screen-content .variable-label b { font-size:21px; }
+.water-hmi .hmi-screen-content .variable-label span { font-size:15px; }
+.water-hmi .hmi-screen-content .state-row { font-size:15px; }
+.water-hmi .hmi-screen-content .reading { font-size:30px; }
+.water-hmi .hmi-screen-content .volume { font-size:16px; }
+.water-hmi .hmi-screen-content .trends-screen { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(240px,1.15fr) repeat(2,minmax(215px,1fr)); gap:14px; min-height:740px; padding:0 14px 16px; }
+.water-hmi .hmi-screen-content .trends-toolbar { flex-wrap:wrap; }
+.nutrial-hmi > .hmi-navigation { padding:16px 0; }
+.project-view-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.project-view-actions a,.project-detached-link { color:#0058bc; font-size:13px; text-decoration:none; border:1px solid #bfd3ea; padding:9px 12px; border-radius:6px; background:#fff; }
+.project-view-actions a:hover,.project-detached-link:hover { background:#eaf3ff; }
+.project-detached-link { display:block; text-align:center; margin-top:10px; }
+.project-portal.project-standalone .portal-header { margin-left:0; }
+.project-portal.project-standalone .portal-sidebar { display:none; }
+.project-portal.project-standalone .portal-layout { display:block; }
+.project-portal.project-standalone .portal-content { padding:18px 20px 24px; }
+.project-portal.project-standalone .portal-intro { margin:0 0 16px; }
+.project-portal.project-standalone .portal-intro h1 { font-size:27px; }
+@media(max-width:850px) { .water-hmi .hmi-screen-content > main > aside { grid-template-columns:1fr; } .hmi-screen-content { min-height:740px; } .hmi-navigation { gap:7px; } }
+@media(max-width:740px) { .water-hmi .hmi-screen-content .trends-screen { grid-template-rows:auto; } .project-portal.project-standalone .portal-content { padding:12px; } }
+/* El documento es el único contenedor de desplazamiento vertical. */
+.water-hmi > .hmi-screen-content,.nutrial-hmi > .hmi-screen-content {
+  height:auto;
+  min-height:0;
+  overflow:visible;
+  scrollbar-gutter:auto;
+}
+.project-portal .portal-water,.project-portal .nutrial-hmi { overflow:visible; }
+.hmi-navigation {
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:#092737;
+  box-shadow:0 5px 10px #00162224;
+  border-radius:10px 10px 0 0;
+}
+.project-portal .electric-navigation {
+  position:sticky;
+  top:0;
+  z-index:30;
+}
+.water-hmi .hmi-screen-content .event-table { max-height:none; }
+.water-hmi .hmi-screen-content > main { overflow:visible; }
+html { scroll-padding-top:100px; }

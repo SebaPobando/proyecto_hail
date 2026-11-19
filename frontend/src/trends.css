@@ -1,0 +1,31 @@
+.trends-screen{display:flex;flex-direction:column;gap:12px;padding:14px 18px 0}
+.trends-toolbar{min-height:62px;background:#0d3850;border-radius:8px;display:flex;align-items:center;gap:23px;padding:9px 20px;margin-bottom:3px}
+.trends-toolbar h2{display:flex;align-items:center;gap:25px;font-size:34px;margin:0;flex:1;font-weight:700}
+.trends-toolbar h2 svg{width:40px;height:36px;flex-shrink:0}
+.period-selector{display:flex;align-items:center;gap:24px;font-size:21px;white-space:nowrap}
+.period-selector>div{display:flex;border:1px solid #aecbde;border-radius:5px;overflow:hidden}
+.period-selector button{background:transparent;border:0;border-right:1px solid #779cad;color:#f3f6f9;min-width:82px;padding:8px 14px;cursor:pointer;font-size:21px}
+.period-selector button:last-child{border-right:0}.period-selector button[aria-pressed=true]{background:#04a6e9;color:white}.period-selector button:hover{background:#17628a}.period-selector button[aria-pressed=true]:hover{background:#04a6e9}
+button:focus-visible{outline:2px solid #e9f7ff;outline-offset:3px}.period-selector button:focus-visible{outline-offset:-3px}
+.trend-date,.trend-updated{display:flex;align-items:center;gap:11px;font-size:20px;white-space:nowrap}.trend-date{border:1px solid #aecbde;border-radius:4px;padding:6px 11px}.trend-date svg,.trend-updated svg{width:28px;height:28px;flex-shrink:0}.trend-updated{border-left:1px solid #a4becd;padding-left:23px}
+.trend-card{height:clamp(180px,11.3vw,210px);border:1.5px solid #00b6ee;border-radius:12px;background:#082737;overflow:hidden;padding:9px 20px 12px}
+.trend-level{height:clamp(200px,12.45vw,232px)}
+.trend-card h3{margin:0 0 5px;font-size:26px;display:flex;align-items:center;gap:23px;height:35px}.instrument-icon{width:39px;height:39px;flex-shrink:0}
+.trend-card-body{display:grid;grid-template-columns:minmax(0,1fr) 305px;height:calc(100% - 40px);gap:27px}
+.trend-plot{position:relative;min-width:0;min-height:0;padding-left:65px}.trend-axis-title{position:absolute;left:10px;top:43%;transform:translate(-35%,-50%) rotate(-90deg);white-space:nowrap;font-size:20px}
+.trend-current{border-left:1px solid #c2d4df;padding-left:44px;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;margin-bottom:13px}
+.trend-current>span,.trend-volume>span{font-size:21px}.trend-current>strong{font-size:46px;white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.1}
+.trend-level .trend-current{gap:5px}.trend-level .trend-current>strong{font-size:42px}
+.trend-volume{border-top:2px solid #00b6ee;padding-top:9px;margin-top:4px}.trend-volume>div{display:flex;align-items:baseline;gap:15px;margin-top:4px;white-space:nowrap}.trend-volume strong{font-size:35px;font-variant-numeric:tabular-nums}.trend-volume>div>span{font-size:18px}
+.trend-message{display:flex;align-items:center;justify-content:center;gap:12px;color:#c3d6e2}.trend-message button{border:1px solid #78b9d9;border-radius:4px;background:#16445d;color:white;padding:7px;cursor:pointer}
+.trends-screen+nav{margin-top:14px}nav button:not(:disabled){cursor:pointer}
+@media(min-width:1600px){.trend-card-body{grid-template-columns:minmax(0,1fr) 325px}.trend-current{padding-left:44px}}
+@media(max-width:1450px){.trends-toolbar{gap:16px;padding:9px 16px}.trends-toolbar h2{font-size:29px;gap:18px}.period-selector{gap:15px;font-size:18px}.period-selector button{font-size:18px;min-width:65px;padding:8px 10px}.trend-date,.trend-updated{font-size:16px}.trend-updated{padding-left:16px;gap:8px}.trend-card{padding:8px 16px 10px}.trend-card h3{font-size:22px}.trend-card-body{grid-template-columns:minmax(0,1fr) 265px;gap:18px}.trend-current{padding-left:30px}.trend-current>strong{font-size:37px}.trend-level .trend-current>strong{font-size:35px}.trend-current>span,.trend-volume>span{font-size:18px}.trend-volume strong{font-size:29px}.trend-volume>div>span{font-size:15px}.trend-axis-title{font-size:17px}.trend-plot{padding-left:48px}.trend-level{height:212px}}
+@media(max-width:1150px){.trends-toolbar{flex-wrap:wrap;gap:12px}.trends-toolbar h2{flex:1}.trend-updated{margin-left:auto}.trend-date{font-size:15px}.trend-card-body{grid-template-columns:minmax(0,1fr) 230px;gap:8px}.trend-current{padding-left:22px}.trend-current>strong{font-size:32px}.trend-level .trend-current>strong{font-size:32px}.trend-volume strong{font-size:26px}.trend-volume>div{gap:8px}.trend-card h3{font-size:21px}.trend-card{height:200px}.trend-level{height:220px}}
+@media(max-width:850px){.trends-screen{padding:12px 11px 0}.trends-toolbar h2{font-size:26px}.trend-card h3{font-size:20px;gap:15px}.trend-card-body{grid-template-columns:minmax(0,1fr) 197px}.trend-current{padding-left:15px}.trend-current>strong{font-size:28px}.trend-current>span,.trend-volume>span{font-size:16px}.trend-level .trend-current>strong{font-size:30px}.trend-volume strong{font-size:25px}.trend-volume>div{flex-wrap:wrap;gap:2px 10px}.trend-volume>div>span{font-size:14px}.trend-axis-title{font-size:16px;left:7px}.trend-plot{padding-left:32px}.trend-card{height:210px}.trend-level{height:235px}}
+/* Espacio para ejes completos y lectura de volumen, sin recortes. */
+.trend-card{height:clamp(200px,12.6vw,224px)}
+.trend-level{height:clamp(238px,14.7vw,260px)}
+.trend-card-body{min-height:0;grid-template-rows:minmax(0,1fr)}
+.trend-current{min-height:0}
+@media(max-width:850px){.trend-card{height:218px}.trend-level{height:245px}}

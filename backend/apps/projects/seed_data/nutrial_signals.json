@@ -1,0 +1,582 @@
+[
+  {
+    "number": 1,
+    "type": "DI",
+    "address": "I0.0",
+    "tag": "DI_ParadaEmerg_OK",
+    "description": "Relé de seguridad: parada de emergencia OK",
+    "module": "CPU 1215C",
+    "device": "-KS1 relé seguridad",
+    "logic": "NA (1 = OK)"
+  },
+  {
+    "number": 2,
+    "type": "DI",
+    "address": "I0.1",
+    "tag": "DI_Reset",
+    "description": "Pulsador reconocimiento de fallas (frente tablero)",
+    "module": "CPU 1215C",
+    "device": "-S1",
+    "logic": "NA"
+  },
+  {
+    "number": 3,
+    "type": "DI",
+    "address": "I0.2",
+    "tag": "DI_K0_Fases_OK",
+    "description": "Relé control de fases OK",
+    "module": "CPU 1215C",
+    "device": "-K0 RM22TR33",
+    "logic": "NA (1 = OK)"
+  },
+  {
+    "number": 4,
+    "type": "DI",
+    "address": "I0.3",
+    "tag": "DI_TC01_F1_OK",
+    "description": "TC-01 tecle: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-TC01-F1 aux 13-14",
+    "logic": "NA"
+  },
+  {
+    "number": 5,
+    "type": "DI",
+    "address": "I0.4",
+    "tag": "DI_BB01_F1_OK",
+    "description": "BB-01-M1 rosca: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-BB01-F1 aux 13-14",
+    "logic": "NA"
+  },
+  {
+    "number": 6,
+    "type": "DI",
+    "address": "I0.5",
+    "tag": "DI_BB01_U1_Listo",
+    "description": "BB-01-U1 VDF: listo / sin falla",
+    "module": "CPU 1215C",
+    "device": "-BB01-U1 relé R1",
+    "logic": "NA (1 = OK)"
+  },
+  {
+    "number": 7,
+    "type": "DI",
+    "address": "I0.6",
+    "tag": "DI_BB01_U1_Marcha",
+    "description": "BB-01-U1 VDF: en marcha",
+    "module": "CPU 1215C",
+    "device": "-BB01-U1 relé R2",
+    "logic": "NA"
+  },
+  {
+    "number": 8,
+    "type": "DI",
+    "address": "I0.7",
+    "tag": "DI_BB01_F2_OK",
+    "description": "BB-01-MV1 motovibrador: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-BB01-F2 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 9,
+    "type": "DI",
+    "address": "I1.0",
+    "tag": "DI_BB01_K2_Fb",
+    "description": "BB-01-MV1 motovibrador: contactor cerrado",
+    "module": "CPU 1215C",
+    "device": "-BB01-K2 aux 13-14",
+    "logic": "NA"
+  },
+  {
+    "number": 10,
+    "type": "DI",
+    "address": "I1.1",
+    "tag": "DI_TZ01_F1_OK",
+    "description": "TZ-01-MV1: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-TZ01-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 11,
+    "type": "DI",
+    "address": "I1.2",
+    "tag": "DI_TZ01_K1_Fb",
+    "description": "TZ-01-MV1: contactor cerrado",
+    "module": "CPU 1215C",
+    "device": "-TZ01-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 12,
+    "type": "DI",
+    "address": "I1.3",
+    "tag": "DI_ES01_F1_OK",
+    "description": "ES-01-M1: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-ES01-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 13,
+    "type": "DI",
+    "address": "I1.4",
+    "tag": "DI_ES01_K1_Fb",
+    "description": "ES-01-M1: contactor cerrado",
+    "module": "CPU 1215C",
+    "device": "-ES01-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 14,
+    "type": "DI",
+    "address": "I1.5",
+    "tag": "DI_TZ02_F1_OK",
+    "description": "TZ-02-MV1: guardamotor cerrado",
+    "module": "CPU 1215C",
+    "device": "-TZ02-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 15,
+    "type": "DI",
+    "address": "I8.0",
+    "tag": "DI_TZ02_K1_Fb",
+    "description": "TZ-02-MV1: contactor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-TZ02-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 16,
+    "type": "DI",
+    "address": "I8.1",
+    "tag": "DI_ES02_F1_OK",
+    "description": "ES-02-M1: guardamotor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-ES02-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 17,
+    "type": "DI",
+    "address": "I8.2",
+    "tag": "DI_ES02_K1_Fb",
+    "description": "ES-02-M1: contactor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-ES02-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 18,
+    "type": "DI",
+    "address": "I8.3",
+    "tag": "DI_ES03_F1_OK",
+    "description": "ES-03-M1: guardamotor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-ES03-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 19,
+    "type": "DI",
+    "address": "I8.4",
+    "tag": "DI_ES03_K1_Fb",
+    "description": "ES-03-M1: contactor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-ES03-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 20,
+    "type": "DI",
+    "address": "I8.5",
+    "tag": "DI_SP01_F1_OK",
+    "description": "SP-01-M1 soplador: guardamotor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-SP01-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 21,
+    "type": "DI",
+    "address": "I8.6",
+    "tag": "DI_SP01_K1_Fb",
+    "description": "SP-01-M1: contactor de línea cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-SP01-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 22,
+    "type": "DI",
+    "address": "I8.7",
+    "tag": "DI_SP01_U1_OK",
+    "description": "SP-01-U1 partidor suave: sin falla",
+    "module": "SM 1221 DI16",
+    "device": "-SP01-U1 relé falla",
+    "logic": "NC (1 = OK)"
+  },
+  {
+    "number": 23,
+    "type": "DI",
+    "address": "I9.0",
+    "tag": "DI_SP01_U1_FinRampa",
+    "description": "SP-01-U1 partidor suave: fin de rampa / by-pass",
+    "module": "SM 1221 DI16",
+    "device": "-SP01-U1 relé R2",
+    "logic": "NA"
+  },
+  {
+    "number": 24,
+    "type": "DI",
+    "address": "I9.1",
+    "tag": "DI_MZ01_F1_OK",
+    "description": "MZ-01-M1 mezcladora: guardamotor cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-MZ01-F1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 25,
+    "type": "DI",
+    "address": "I9.2",
+    "tag": "DI_MZ01_K1_Fb",
+    "description": "MZ-01-M1: contactor de línea cerrado",
+    "module": "SM 1221 DI16",
+    "device": "-MZ01-K1 aux",
+    "logic": "NA"
+  },
+  {
+    "number": 26,
+    "type": "DI",
+    "address": "I9.3",
+    "tag": "DI_MZ01_U1_OK",
+    "description": "MZ-01-U1 partidor suave: sin falla",
+    "module": "SM 1221 DI16",
+    "device": "-MZ01-U1 relé falla",
+    "logic": "NC (1 = OK)"
+  },
+  {
+    "number": 27,
+    "type": "DI",
+    "address": "I9.4",
+    "tag": "DI_MZ01_U1_FinRampa",
+    "description": "MZ-01-U1 partidor suave: fin de rampa / by-pass",
+    "module": "SM 1221 DI16",
+    "device": "-MZ01-U1 relé R2",
+    "logic": "NA"
+  },
+  {
+    "number": 28,
+    "type": "DI",
+    "address": "I9.5",
+    "tag": "DI_MZ01_ZSC",
+    "description": "MZ-01 compuerta descarga: cerrada",
+    "module": "SM 1221 DI16",
+    "device": "Final de carrera / sensor",
+    "logic": "NA"
+  },
+  {
+    "number": 29,
+    "type": "DI",
+    "address": "I9.6",
+    "tag": "DI_MZ01_ZSO",
+    "description": "MZ-01 compuerta descarga: abierta",
+    "module": "SM 1221 DI16",
+    "device": "Final de carrera / sensor",
+    "logic": "NA"
+  },
+  {
+    "number": 30,
+    "type": "DI",
+    "address": "I9.7",
+    "tag": "DI_DH01_Marcha",
+    "description": "DH-01 deshumidificador: en marcha",
+    "module": "SM 1221 DI16",
+    "device": "Contacto seco Trotec",
+    "logic": "NA"
+  },
+  {
+    "number": 31,
+    "type": "DI",
+    "address": "I12.0",
+    "tag": "DI_DH01_OK",
+    "description": "DH-01 deshumidificador: sin falla",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "Contacto seco Trotec",
+    "logic": "NC (1 = OK)"
+  },
+  {
+    "number": 32,
+    "type": "DI",
+    "address": "I12.1",
+    "tag": "DI_EN01_Listo",
+    "description": "EN-01 ensacadora: lista para recibir producto",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "Tablero Bühler MEAG-P",
+    "logic": "NA"
+  },
+  {
+    "number": 33,
+    "type": "DI",
+    "address": "I12.2",
+    "tag": "DI_EN01_OK",
+    "description": "EN-01 ensacadora: sin falla",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "Tablero Bühler MEAG-P",
+    "logic": "NC (1 = OK)"
+  },
+  {
+    "number": 34,
+    "type": "DI",
+    "address": "I12.3",
+    "tag": "DI_EN01_TolvaLlena",
+    "description": "EN-01 tolva ensacadora: nivel alto",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "Sensor nivel / Bühler",
+    "logic": "NA (1 = llena)"
+  },
+  {
+    "number": 35,
+    "type": "DI",
+    "address": "I12.4",
+    "tag": "DI_TZ02_PB_Inicio",
+    "description": "Botonera TZ-02: inicio carga manual",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-S20 botonera local",
+    "logic": "NA"
+  },
+  {
+    "number": 36,
+    "type": "DI",
+    "address": "I12.5",
+    "tag": "DI_TZ02_PB_Fin",
+    "description": "Botonera TZ-02: fin carga manual",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-S21 botonera local",
+    "logic": "NA"
+  },
+  {
+    "number": 37,
+    "type": "DI",
+    "address": "I12.6",
+    "tag": "DI_Control_OK",
+    "description": "Tensión de control 220 V AC / 24 V DC OK",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-F10/-F11 aux",
+    "logic": "NA (1 = OK)"
+  },
+  {
+    "number": 38,
+    "type": "DO",
+    "address": "Q0.0",
+    "tag": "DQ_BB01_U1_Marcha",
+    "description": "BB-01-U1 VDF: marcha",
+    "module": "CPU 1215C",
+    "device": "-BB01-U1 LI1 (vía relé)",
+    "logic": null
+  },
+  {
+    "number": 39,
+    "type": "DO",
+    "address": "Q0.1",
+    "tag": "DQ_BB01_K2",
+    "description": "BB-01-MV1 motovibrador: contactor",
+    "module": "CPU 1215C",
+    "device": "-BB01-KA2 → -BB01-K2",
+    "logic": null
+  },
+  {
+    "number": 40,
+    "type": "DO",
+    "address": "Q0.2",
+    "tag": "DQ_TZ01_K1",
+    "description": "TZ-01-MV1: contactor",
+    "module": "CPU 1215C",
+    "device": "-TZ01-KA1 → -TZ01-K1",
+    "logic": null
+  },
+  {
+    "number": 41,
+    "type": "DO",
+    "address": "Q0.3",
+    "tag": "DQ_ES01_K1",
+    "description": "ES-01-M1: contactor",
+    "module": "CPU 1215C",
+    "device": "-ES01-KA1 → -ES01-K1",
+    "logic": null
+  },
+  {
+    "number": 42,
+    "type": "DO",
+    "address": "Q0.4",
+    "tag": "DQ_TZ02_K1",
+    "description": "TZ-02-MV1: contactor",
+    "module": "CPU 1215C",
+    "device": "-TZ02-KA1 → -TZ02-K1",
+    "logic": null
+  },
+  {
+    "number": 43,
+    "type": "DO",
+    "address": "Q0.5",
+    "tag": "DQ_ES02_K1",
+    "description": "ES-02-M1: contactor",
+    "module": "CPU 1215C",
+    "device": "-ES02-KA1 → -ES02-K1",
+    "logic": null
+  },
+  {
+    "number": 44,
+    "type": "DO",
+    "address": "Q0.6",
+    "tag": "DQ_ES03_K1",
+    "description": "ES-03-M1: contactor",
+    "module": "CPU 1215C",
+    "device": "-ES03-KA1 → -ES03-K1",
+    "logic": null
+  },
+  {
+    "number": 45,
+    "type": "DO",
+    "address": "Q0.7",
+    "tag": "DQ_SP01_Marcha",
+    "description": "SP-01: contactor de línea + marcha partidor suave",
+    "module": "CPU 1215C",
+    "device": "-SP01-KA1",
+    "logic": null
+  },
+  {
+    "number": 46,
+    "type": "DO",
+    "address": "Q1.0",
+    "tag": "DQ_MZ01_Marcha",
+    "description": "MZ-01: contactor de línea + marcha partidor suave",
+    "module": "CPU 1215C",
+    "device": "-MZ01-KA1",
+    "logic": null
+  },
+  {
+    "number": 47,
+    "type": "DO",
+    "address": "Q1.1",
+    "tag": "DQ_MZ01_Y1_Abrir",
+    "description": "MZ-01 compuerta descarga: electroválvula abrir",
+    "module": "CPU 1215C",
+    "device": "-MZ01-Y1 24 V DC",
+    "logic": null
+  },
+  {
+    "number": 48,
+    "type": "DO",
+    "address": "Q12.0",
+    "tag": "DQ_DH01_Marcha",
+    "description": "DH-01: marcha remota",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-DH01-KA1 → bornes Trotec",
+    "logic": null
+  },
+  {
+    "number": 49,
+    "type": "DO",
+    "address": "Q12.1",
+    "tag": "DQ_EN01_Permiso",
+    "description": "EN-01: permiso de ensacado",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-EN01-KA1 → Bühler",
+    "logic": null
+  },
+  {
+    "number": 50,
+    "type": "DO",
+    "address": "Q12.2",
+    "tag": "DQ_BB01_U1_Reset",
+    "description": "BB-01-U1 VDF: reset de falla",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-BB01-U1 LI (vía relé)",
+    "logic": null
+  },
+  {
+    "number": 51,
+    "type": "DO",
+    "address": "Q12.3",
+    "tag": "DQ_Baliza_Alarma",
+    "description": "Baliza de alarma",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-H1 24 V DC",
+    "logic": null
+  },
+  {
+    "number": 52,
+    "type": "DO",
+    "address": "Q12.4",
+    "tag": "DQ_Bocina",
+    "description": "Bocina de alarma",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-H2 24 V DC",
+    "logic": null
+  },
+  {
+    "number": 53,
+    "type": "DO",
+    "address": "Q12.5",
+    "tag": "DQ_TZ02_LuzCarga",
+    "description": "Botonera TZ-02: piloto solicitud carga manual",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-H20 24 V DC",
+    "logic": null
+  },
+  {
+    "number": 54,
+    "type": "DO",
+    "address": "Q12.6",
+    "tag": "DQ_Luz_Marcha",
+    "description": "Piloto línea en marcha",
+    "module": "SM 1223 DI16/DQ16",
+    "device": "-H3 24 V DC",
+    "logic": null
+  },
+  {
+    "number": 55,
+    "type": "AI",
+    "address": "IW96",
+    "tag": "AI_BB01_Peso",
+    "description": "BB-01 peso bruto big bag (4-20 mA, 0-2000 kg)",
+    "module": "SM 1231 AI4",
+    "device": "Transmisor de peso celdas BB-01",
+    "logic": null
+  },
+  {
+    "number": 56,
+    "type": "AI",
+    "address": "IW98",
+    "tag": "AI_PT01_Presion",
+    "description": "PT-01 presión línea transporte (4-20 mA, 0-1000 mbar)",
+    "module": "SM 1231 AI4",
+    "device": "Transmisor presión salida SP-01",
+    "logic": null
+  },
+  {
+    "number": 57,
+    "type": "AI",
+    "address": "IW100",
+    "tag": "AI_DH01_Humedad",
+    "description": "DH-01 humedad / punto de rocío (opcional)",
+    "module": "SM 1231 AI4",
+    "device": "Sensor opcional Trotec",
+    "logic": null
+  },
+  {
+    "number": 58,
+    "type": "AO",
+    "address": "QW64",
+    "tag": "AQ_BB01_U1_Velocidad",
+    "description": "BB-01-U1 consigna velocidad (4-20 mA)",
+    "module": "CPU 1215C AQ0",
+    "device": "-BB01-U1 AI2",
+    "logic": null
+  }
+]

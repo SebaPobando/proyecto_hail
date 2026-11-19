@@ -1,0 +1,97 @@
+/* Desktop HMI: the header and navigation reserve space before the panels grow. */
+@media (min-width: 1000px) and (min-height: 590px) {
+  .app-shell {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-shell > .header {
+    flex: none;
+    height: clamp(70px, 11dvh, 110px);
+    padding-block: 8px;
+  }
+
+  .app-shell .header-title { padding-block: 0; }
+  .app-shell .header h1 { font-size: clamp(27px, min(2.75vw, 4.8dvh), 49px); }
+  .app-shell .header p { font-size: clamp(15px, min(1.57vw, 2.7dvh), 28px); }
+  .app-shell .drop { height: 85%; }
+
+  .app-shell > .demo-strip {
+    flex: none;
+    height: 28px;
+    padding-block: 2px;
+  }
+
+  .app-shell > nav {
+    flex: none;
+    height: clamp(47px, 7dvh, 65px);
+    margin: 8px 11px;
+    padding: 4px;
+  }
+
+  .app-shell > main {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .app-shell > main:has(.process-panel) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .app-shell .process-panel { display: flex; flex-direction: column; }
+  .app-shell .process-panel h2 { flex: none; }
+  .app-shell .process-svg { flex: 1; min-height: 0; height: 0; width: 100%; }
+  .app-shell aside { min-height: 0; gap: clamp(7px, 1.25dvh, 16px); overflow: auto; }
+  .app-shell aside .panel { flex: 1 0 auto; }
+  .app-shell .panel h2 {
+    height: clamp(35px, 5.4dvh, 56px);
+    font-size: clamp(19px, min(1.82vw, 3.4dvh), 32px);
+  }
+  .app-shell aside .panel-body { padding-block: clamp(5px, 1dvh, 14px); gap: clamp(4px, .8dvh, 8px); }
+  .app-shell .variable-row, .app-shell .state-row {
+    min-height: clamp(39px, 7.1dvh, 72px);
+    padding-block: 3px;
+  }
+  .app-shell .variable-label b { font-size: clamp(16px, min(1.6vw, 3dvh), 28px); }
+  .app-shell .variable-label span, .app-shell .volume { font-size: clamp(12px, min(1.15vw, 2.35dvh), 20px); }
+  .app-shell .reading { font-size: clamp(21px, min(2.45vw, 4.5dvh), 44px); }
+  .app-shell .state-row svg { height: clamp(25px, 4.6dvh, 44px); }
+  .app-shell .state-row { font-size: clamp(12px, min(1.08vw, 2.35dvh), 20px); }
+
+  .app-shell .trends-screen, .app-shell .alarms-screen { padding-top: 8px; gap: 7px; }
+  .app-shell .trends-toolbar { flex: none; min-height: 44px; padding-block: 5px; }
+  .app-shell .trends-toolbar h2 { font-size: clamp(23px, 3.5dvh, 34px); }
+  .app-shell .period-selector button { padding-block: 5px; }
+  .app-shell .trend-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 105px;
+    height: auto;
+    padding-block: 5px;
+  }
+  .app-shell .trend-level { flex: 1.15 0 125px; }
+  .app-shell .trend-card h3 { flex: none; height: 28px; font-size: clamp(17px, 2.8dvh, 26px); }
+  .app-shell .instrument-icon { height: 29px; }
+  .app-shell .trend-card-body { flex: 1; height: auto; }
+  .app-shell .trend-current { gap: 4px; margin-bottom: 5px; }
+  .app-shell .trend-current > strong, .app-shell .trend-volume strong { font-size: clamp(23px, 4.3dvh, 42px); }
+  .app-shell .trend-current > span, .app-shell .trend-volume > span { font-size: clamp(13px, 2.45dvh, 21px); }
+  .app-shell .trend-volume { margin-top: 0; padding-top: 4px; }
+  .app-shell .trend-volume > div { margin-top: 0; }
+
+  .app-shell .alarm-overview, .app-shell .alarm-section:not(.events-section) { flex: none; }
+  .app-shell .alarm-titlebar, .app-shell .alarm-section-heading { height: clamp(32px, 5.1dvh, 50px); }
+  .app-shell .alarm-titlebar h2, .app-shell .alarm-section-heading h3 { font-size: clamp(20px, 3.3dvh, 29px); }
+  .app-shell .alarm-overview-body { padding-block: 9px; }
+  .app-shell .alarm-summary { min-height: clamp(55px, 10dvh, 95px); padding-block: 5px; }
+  .app-shell .alarm-summary strong { font-size: clamp(25px, 4.4dvh, 41px); }
+  .app-shell .alarm-summary svg { height: clamp(30px, 6dvh, 56px); }
+  .app-shell .alarm-filters select { height: 34px; }
+  .app-shell .alarm-section { padding-bottom: 8px; }
+  .app-shell .alarm-table-wrap :is(th, td) { padding-block: 4px; }
+  .app-shell .events-section { display: flex; flex-direction: column; flex: 1 0 100px; }
+  .app-shell .events-section .alarm-section-heading { flex: none; }
+  .app-shell .event-table { flex: 1; min-height: 0; max-height: none; }
+}
