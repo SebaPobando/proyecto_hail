@@ -60,6 +60,11 @@ PROJECTS = [
     },
 ]
 
+STATE_LABELS = {
+    "P-101": {"0": "Detenida", "1": "En marcha", "2": "Falla"},
+    "D-101": {"0": "Inactiva", "1": "Activa", "2": "Falla"},
+}
+
 AGUAPOZO_SIGNALS = [
     # tag, descripción, tipo, unidad, mín, máx, decimales
     ("LT-101", "Nivel del estanque", "AI", "%", 0, 100, 1),
@@ -154,6 +159,7 @@ class Command(BaseCommand):
                     "max_value": high,
                     "decimals": decimals,
                     "position": position,
+                    "state_labels": STATE_LABELS.get(tag, {}),
                 },
             )
 
@@ -163,7 +169,12 @@ class Command(BaseCommand):
             device, _ = Device.objects.update_or_create(
                 project=project,
                 code=code.lower(),
-                defaults={"name": name, "kind": Device.Kind.METER, "hardware_model": model},
+                defaults={
+                    "name": name,
+                    "kind": Device.Kind.METER,
+                    "hardware_model": model,
+                    "decoder": Device.Decoder.HAIL_V1,
+                },
             )
             for suffix, description, unit, decimals in METER_VARIABLES:
                 position += 1

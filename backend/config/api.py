@@ -11,6 +11,7 @@ from ninja.security import django_auth
 
 from apps.accounts.api import router as auth_router
 from apps.projects.api import router as projects_router
+from apps.telemetry.api import router as telemetry_router
 
 api = NinjaAPI(
     title="Hail API",
@@ -22,6 +23,7 @@ api = NinjaAPI(
 
 api.add_router("/auth", auth_router, tags=["auth"])
 api.add_router("/projects", projects_router, tags=["proyectos"])
+api.add_router("/projects", telemetry_router, tags=["telemetría"])
 
 
 @api.get("/health", auth=None, tags=["sistema"])

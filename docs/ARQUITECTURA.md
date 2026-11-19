@@ -6,9 +6,9 @@
 | --- | --- | --- |
 | Frontend (HMI, portal) | React 19 + TypeScript + Vite | Existente; se conecta a la API en F3 |
 | API y administración | Django 5.2 + Django Ninja | F1 |
-| Base de datos | PostgreSQL + TimescaleDB | F1 (relacional), F2 (series de tiempo) |
+| Base de datos | PostgreSQL + TimescaleDB | F1 (relacional), F2 (hypertable de lecturas) |
 | Broker MQTT | Mosquitto en desarrollo; producción por decidir (EMQX o Mosquitto) | F2 |
-| Ingesta | Worker Python `manage.py ingest_mqtt` | F2 |
+| Ingesta | Worker Python `manage.py ingest_mqtt` (paho-mqtt) | F2 (listo) |
 | Tiempo real y tareas | Redis + Django Channels + Celery | F4 |
 | Proxy y TLS | Caddy | F5 |
 
@@ -20,8 +20,10 @@ Cadena de datos: PLC → gateway (Haiwell CBOX) → broker MQTT → worker de in
 Organization (cliente)
  ├─ Membership ── User           rol: viewer | operator | org_admin
  └─ Project (instalación)        hmi_type: aguapozo | nutrial | electrical | generic
-     ├─ Device (PLC, gateway, medidor)   credencial MQTT propia (solo hash)
-     └─ Signal (tag)             unidad, rango válido, escala, dirección, módulo
+     ├─ Device (PLC, gateway, medidor)   credencial MQTT propia (solo hash), decodificador
+     └─ Signal (tag)             unidad, rango válido, escala, dirección, módulo, etiquetas de estado
+         ├─ Reading              historial: PK (señal, tiempo), valor, calidad · hypertable en TimescaleDB
+         └─ LatestReading        último valor por señal
 AuditLog                          accesos, cambios de permisos, recuperación de contraseña
 ```
 
@@ -57,12 +59,27 @@ Sesión de Django + CSRF. El frontend llama primero a `/api/auth/csrf` y envía 
 | GET | `/api/projects` | Sí | Proyectos visibles para el usuario |
 | GET | `/api/projects/{slug}` | Sí | Detalle, dispositivos y número de señales |
 | GET | `/api/projects/{slug}/signals` | Sí | Catálogo de señales |
+| GET | `/api/projects/{slug}/latest` | Sí | Valor actual de cada señal, calidad y si está vencido (> 30 s) |
+| GET | `/api/projects/{slug}/history?tags=&start=&end=&points=` | Sí | Historial agregado (promedio, mín., máx., muestras) por intervalo; máx. 31 días y 20 señales |
 
 Esquema OpenAPI: `/api/openapi.json`. Documentación interactiva: `/api/docs`.
 
-## Convención MQTT (F2)
+## Telemetría (F2)
 
-`hail/{organización}/{proyecto}/{dispositivo}/telemetry`, por ejemplo `hail/aguapozo/aguapozo/cbox-01/telemetry`. Cada dispositivo tendrá usuario y ACL propios: solo puede publicar en su tópico.
+Tópico `hail/{organización}/{proyecto}/{dispositivo}/telemetry`. Formatos, reglas de validación y lo que falta de la CBOX: [PROTOCOLO_MQTT.md](PROTOCOLO_MQTT.md).
+
+```
+equipo ──MQTT──▶ broker ──▶ manage.py ingest_mqtt ──▶ telemetry.services.ingest()
+                                                        │ valida tópico, formato, fecha, rango, pertenencia
+                                                        ▼
+                                          Reading (historial) + LatestReading (actual)
+```
+
+- `ingest()` no depende de MQTT: el worker, el simulador (`simulate_telemetry --direct`) y las pruebas la llaman igual.
+- Decodificadores por dispositivo en `apps/telemetry/decoders.py` (`hail_v1`, `test_v1`; `haiwell_cbox` pendiente de la trama real).
+- El historial se agrega en Python por ahora. Con volumen real se pasa a agregados continuos de TimescaleDB sin cambiar la API.
+
+Pendiente de F2: usuario y ACL por dispositivo en el broker, retención y compresión (plazos por acordar), diagnóstico del worker para la pantalla Conectividad.
 
 ## Frontend
 
@@ -85,7 +102,8 @@ Reglas que sigue el backend; respétalas al agregar código.
 | `admin.py` | Registro en el admin, con `list_select_related` en toda lista con FK |
 | `api.py` | Un `Router` de Ninja; se monta en `config/api.py` |
 | `schemas.py` | `Schema` / `ModelSchema` de entrada y salida; cálculos con `resolve_*` |
-| `services.py` | Operaciones con efectos (ej. `audit.services.record`) |
+| `services.py` | Operaciones con efectos (ej. `audit.services.record`, `telemetry.services.ingest`) |
+| `queries.py` | Consultas de lectura armadas para la API |
 | `receivers.py` | Señales de Django; se importan en `AppConfig.ready()` |
 | `management/commands/` | Comandos `manage.py` |
 | `seed_data/` | Datos de carga inicial propios. `fixtures/` queda reservado para `loaddata` |

@@ -5,3 +5,4 @@ django-environ>=0.12
 email-validator>=2.2
 psycopg[binary]>=3.2
 uvicorn>=0.32
+paho-mqtt>=2.1

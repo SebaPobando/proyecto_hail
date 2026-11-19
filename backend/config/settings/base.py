@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.tenancy",
     "apps.projects",
     "apps.audit",
+    "apps.telemetry",
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,9 @@ TEMPLATES = [
 DATABASES = {
     "default": env.db("DATABASE_URL", default="postgres://hail:hail@localhost:5432/hail"),
 }
+# Reutiliza conexiones (el worker de ingesta vive mucho tiempo) y verifica que sigan vivas.
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("DJANGO_CONN_MAX_AGE", default=60)
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
@@ -100,6 +104,13 @@ DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="Hail <no-responde
 
 # URL pública del frontend; se usa en los enlaces de los correos.
 FRONTEND_URL = env("HAIL_FRONTEND_URL", default="http://localhost:5173")
+
+# Telemetría
+MQTT_URL = env("HAIL_MQTT_URL", default="mqtt://localhost:1883")
+MQTT_USERNAME = env("HAIL_MQTT_USERNAME", default="")
+MQTT_PASSWORD = env("HAIL_MQTT_PASSWORD", default="")
+# Segundos sin datos tras los cuales una lectura se informa como vencida.
+TELEMETRY_STALE_SECONDS = env.int("HAIL_TELEMETRY_STALE_SECONDS", default=30)
 
 LOGGING = {
     "version": 1,

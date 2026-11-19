@@ -87,7 +87,8 @@ class Device(models.Model):
 
     class Decoder(models.TextChoices):
         UNSET = "unset", "Por definir"
-        TEST_V1 = "test_v1", "Mensaje de prueba v1"
+        HAIL_V1 = "hail_v1", "Formato Hail v1"
+        TEST_V1 = "test_v1", "Mensaje de prueba v1 (AguaPozo)"
         HAIWELL_CBOX = "haiwell_cbox", "Haiwell CBOX"
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="devices", verbose_name="proyecto")
@@ -147,6 +148,12 @@ class Signal(models.Model):
     module = models.CharField("módulo", max_length=80, blank=True)
     field_device = models.CharField("elemento de campo", max_length=120, blank=True)
     logic = models.CharField("lógica", max_length=80, blank=True)
+    state_labels = models.JSONField(
+        "etiquetas de estado",
+        default=dict,
+        blank=True,
+        help_text='Solo señales de estado. Ej.: {"0": "Detenida", "1": "En marcha", "2": "Falla"}.',
+    )
     position = models.PositiveIntegerField("orden", default=0)
     is_active = models.BooleanField("activa", default=True)
 

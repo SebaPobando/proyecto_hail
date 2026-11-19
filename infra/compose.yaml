@@ -1,6 +1,6 @@
 # Servicios de desarrollo de Hail.
 #   docker compose -f infra/compose.yaml up -d            -> base de datos, Redis y broker
-#   docker compose -f infra/compose.yaml --profile app up -> además, el backend en un contenedor
+#   docker compose -f infra/compose.yaml --profile app up -> además, backend y worker de ingesta en contenedores
 # Los puertos se publican solo en 127.0.0.1.
 name: hail
 
@@ -49,6 +49,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  ingest:
+    profiles: ["app"]
+    build: ../backend
+    command: python manage.py ingest_mqtt
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgres://hail:hail@db:5432/hail
+      HAIL_MQTT_URL: mqtt://mqtt:1883
+    volumes:
+      - ../backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   db-data:
