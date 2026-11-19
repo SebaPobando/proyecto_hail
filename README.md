@@ -106,7 +106,7 @@ Estamos migrando la plataforma desde un prototipo (Node + Firebase) a una base p
 | --- | --- | --- |
 | F0 · Preparación | Orden del proyecto, entorno de desarrollo, pruebas automáticas | **Listo** (falta capturar la trama real de la CBOX) |
 | F1 · Plataforma multicliente | Clientes, usuarios, permisos, proyectos, equipos y señales administrables; registro de auditoría | **Listo** |
-| F2 · Recepción de datos | Broker MQTT, validación, base de datos de series de tiempo, historial | **En curso**: recepción, validación, historial y simulador listos; faltan credenciales por equipo en el broker |
+| F2 · Recepción de datos | Broker MQTT, validación, base de datos de series de tiempo, historial | **Listo** (falta definir cuánto tiempo se guardan los datos crudos) |
 | F3 · Pantallas conectadas | Las HMI actuales leen desde la nueva plataforma | Pendiente |
 | F4 · Operación | Alarmas configurables, avisos por correo o mensajería, bitácora compartida | Pendiente |
 | F5 · Producción | Servidor, cifrado, respaldos, monitoreo; piloto con AguaPozo en datos reales | Pendiente |
@@ -166,8 +166,8 @@ project_hail/
 Requisitos: Python 3.12+, Node.js 22, Docker Desktop.
 
 ```powershell
-# 1. Servicios: PostgreSQL + TimescaleDB, Redis y Mosquitto
-docker compose -f infra/compose.yaml up -d
+# 1. Servicios: PostgreSQL + TimescaleDB y Redis (--wait espera a que la base esté lista)
+docker compose -f infra/compose.yaml up -d --wait db redis
 
 # 2. Backend
 cd backend
@@ -186,18 +186,40 @@ python manage.py runserver
 - API con documentación interactiva: http://localhost:8000/api/docs
 - Usuarios de prueba: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local` (contraseña `hail-demo-2026`, solo en desarrollo).
 
-**Datos simulados** (otra terminal, con el entorno activado):
+**Datos simulados sin broker** (otra terminal, con el entorno activado):
 
 ```powershell
-# Sin broker: escribe directo en la base cada 10 s
-python manage.py simulate_telemetry --direct
-
-# Con Docker: recepción real por MQTT
-python manage.py ingest_mqtt          # terminal 1: worker que escucha el broker
-python manage.py simulate_telemetry   # terminal 2: publica como lo haría la CBOX
+python manage.py simulate_telemetry --direct   # escribe directo en la base cada 10 s
 ```
 
 Los datos entran en Admin → Telemetría → Lecturas actuales, y en la API: `GET /api/projects/aguapozo/latest`.
+
+### Recepción real por MQTT (Docker)
+
+El broker no acepta conexiones anónimas: cada equipo tiene su usuario y solo puede publicar en su tópico.
+
+```powershell
+# 1. En backend\.env: DATABASE_URL de PostgreSQL (127.0.0.1:5433) y las cuentas MQTT (ver .env.example)
+# 2. Genera los archivos de usuarios y permisos del broker desde la base
+python manage.py mqtt_sync_auth
+# 3. Levanta (o reinicia) los servicios; --wait espera a que la base esté lista
+docker compose -f infra/compose.yaml up -d --wait
+# 4. Worker y simulador, cada uno en su terminal
+python manage.py ingest_mqtt
+python manage.py simulate_telemetry
+```
+
+Para dar acceso a un equipo de campo: Admin → Dispositivos → usuario MQTT y nueva contraseña. Luego `python manage.py mqtt_sync_auth` y `docker compose -f infra/compose.yaml kill -s SIGHUP mqtt` (el broker relee los permisos sin cortar a nadie).
+
+Si cambias de SQLite a PostgreSQL, la base nueva parte vacía: repite `migrate`, `createsuperuser` y `seed_demo`.
+
+**Problemas comunes**
+
+| Síntoma | Causa y solución |
+| --- | --- |
+| `ports are not available ... 5432` o `la autentificación password falló para el usuario hail` | Hay un PostgreSQL instalado en el equipo usando el 5432. La base de Docker usa el **5433**: revisa que `DATABASE_URL` en `backend\.env` diga `127.0.0.1:5433`. |
+| El simulador dice "No hay broker" o el contenedor `mqtt` se reinicia | Faltan los archivos de usuarios del broker: corre `python manage.py mqtt_sync_auth` (necesita la base arriba). |
+| `server closed the connection unexpectedly` al hacer `migrate` | La base aún se estaba inicializando (la primera vez tarda unos segundos y se reinicia por dentro). Levántala con `--wait` o espera a que `docker compose ps` diga `healthy`, y repite `migrate`. |
 
 ```powershell
 # 3. Pantallas (otra terminal). Usan el prototipo con Firebase hasta la fase F3.
@@ -214,7 +236,7 @@ pytest              # pruebas automáticas
 ruff check .        # revisión de estilo y errores
 ```
 
-En integración continua las pruebas corren además contra PostgreSQL + TimescaleDB.
+Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para correrlas contra PostgreSQL, define `HAIL_TEST_DATABASE_URL` (en integración continua corren contra PostgreSQL + TimescaleDB).
 
 ## Documentación
 

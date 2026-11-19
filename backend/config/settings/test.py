@@ -1,15 +1,19 @@
 """Configuración para pytest.
 
-Usa SQLite en memoria salvo que se defina DATABASE_URL (CI usa PostgreSQL +
-TimescaleDB para probar contra el motor real).
+Las pruebas no dependen de backend/.env: usan SQLite en memoria salvo que se
+defina HAIL_TEST_DATABASE_URL (CI la define para probar contra PostgreSQL +
+TimescaleDB).
 """
-
-import os
+import environ
 
 from .base import *  # noqa: F403
 
-if "DATABASE_URL" not in os.environ:
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
+_test_db = environ.Env().str("HAIL_TEST_DATABASE_URL", default="")
+DATABASES = {
+    "default": environ.Env.db_url_config(_test_db)
+    if _test_db
+    else {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}
+}
 
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"

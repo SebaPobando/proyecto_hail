@@ -14,7 +14,7 @@ from apps.projects.api import visible_projects
 from apps.projects.models import Signal
 
 from . import queries
-from .schemas import ErrorOut, HistoryOut, LatestSnapshotOut
+from .schemas import ConnectivityOut, ErrorOut, HistoryOut, LatestSnapshotOut
 
 router = Router()
 
@@ -27,6 +27,13 @@ def latest(request, slug: str):
     """Valor actual de cada señal, con su calidad y si está vencido."""
     project = get_object_or_404(visible_projects(request), slug=slug)
     return queries.latest_snapshot(project)
+
+
+@router.get("/{slug}/connectivity", response=ConnectivityOut)
+def connectivity(request, slug: str):
+    """Estado del worker de ingesta y última comunicación de cada dispositivo."""
+    project = get_object_or_404(visible_projects(request), slug=slug)
+    return queries.connectivity(project, include_totals=request.user.is_platform_admin)
 
 
 @router.get("/{slug}/history", response={200: HistoryOut, 400: ErrorOut})

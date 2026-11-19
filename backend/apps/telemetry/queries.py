@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.projects.models import Project, Signal
 
-from .models import LatestReading, Reading
+from .models import LatestReading, Reading, WorkerStatus
 
 
 def latest_snapshot(project: Project, *, now: datetime | None = None) -> dict:
@@ -88,3 +88,40 @@ def history(signals: list[Signal], start: datetime, end: datetime, points: int) 
             }
         )
     return {"start": start, "end": end, "bucket_seconds": bucket_seconds, "series": series}
+
+
+def connectivity(project: Project, *, include_totals: bool, now: datetime | None = None) -> dict:
+    """Estado de cada tramo que Hail puede observar: el worker de ingesta y cada dispositivo.
+
+    No diagnostica el PLC ni la red del cliente: un dispositivo fuera de línea
+    solo significa que no llegan sus mensajes.
+    """
+    now = now or timezone.now()
+    offline_after = settings.TELEMETRY_OFFLINE_SECONDS
+
+    def online(moment) -> bool:
+        return moment is not None and (now - moment).total_seconds() <= offline_after
+
+    worker = None
+    status = WorkerStatus.objects.filter(name="ingest").first()
+    if status is not None:
+        worker = {
+            "online": online(status.last_heartbeat),
+            "broker_connected": online(status.last_heartbeat) and status.broker_connected,
+            "last_heartbeat": status.last_heartbeat,
+            "last_message_at": status.last_message_at,
+        }
+        if include_totals:
+            worker["messages_accepted"] = status.messages_accepted
+            worker["messages_rejected"] = status.messages_rejected
+    devices = [
+        {
+            "code": d.code,
+            "name": d.name,
+            "kind": d.kind,
+            "last_seen_at": d.last_seen_at,
+            "online": online(d.last_seen_at),
+        }
+        for d in project.devices.filter(is_active=True)
+    ]
+    return {"server_time": now, "offline_after_seconds": offline_after, "worker": worker, "devices": devices}

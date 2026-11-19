@@ -61,6 +61,7 @@ Sesión de Django + CSRF. El frontend llama primero a `/api/auth/csrf` y envía 
 | GET | `/api/projects/{slug}/signals` | Sí | Catálogo de señales |
 | GET | `/api/projects/{slug}/latest` | Sí | Valor actual de cada señal, calidad y si está vencido (> 30 s) |
 | GET | `/api/projects/{slug}/history?tags=&start=&end=&points=` | Sí | Historial agregado (promedio, mín., máx., muestras) por intervalo; máx. 31 días y 20 señales |
+| GET | `/api/projects/{slug}/connectivity` | Sí | Estado del worker de ingesta y última comunicación de cada dispositivo (fuera de línea tras 60 s) |
 
 Esquema OpenAPI: `/api/openapi.json`. Documentación interactiva: `/api/docs`.
 
@@ -79,7 +80,19 @@ equipo ──MQTT──▶ broker ──▶ manage.py ingest_mqtt ──▶ tele
 - Decodificadores por dispositivo en `apps/telemetry/decoders.py` (`hail_v1`, `test_v1`; `haiwell_cbox` pendiente de la trama real).
 - El historial se agrega en Python por ahora. Con volumen real se pasa a agregados continuos de TimescaleDB sin cambiar la API.
 
-Pendiente de F2: usuario y ACL por dispositivo en el broker, retención y compresión (plazos por acordar), diagnóstico del worker para la pantalla Conectividad.
+**Seguridad del broker.** Mosquitto sin acceso anónimo. `manage.py mqtt_sync_auth` genera `infra/mosquitto/config/passwd` y `acl` desde la base:
+
+| Cuenta | Permiso |
+| --- | --- |
+| Cada dispositivo con credencial | Publicar solo en su tópico |
+| `hail-ingest` (worker) | Leer `hail/+/+/+/telemetry` |
+| `hail-simulator` (solo si tiene contraseña; desarrollo) | Publicar en `hail/+/+/+/telemetry` |
+
+Las contraseñas se guardan en el formato `$7$` de Mosquitto (PBKDF2-SHA512); nunca en claro. Esos archivos no se versionan.
+
+**Conectividad.** El worker escribe su pulso en `WorkerStatus` cada 15 s (conectado al broker, último mensaje, aceptados y rechazados). Un pulso de más de 60 s significa worker detenido. Los totales de mensajes solo los ve el administrador global.
+
+Pendiente: plazo de retención y compresión del dato crudo (decisión de ingeniería con cada cliente).
 
 ## Frontend
 

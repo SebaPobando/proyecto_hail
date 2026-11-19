@@ -52,3 +52,26 @@ class LatestReading(models.Model):
 
     def __str__(self) -> str:
         return f"{self.signal} = {self.value}"
+
+
+class WorkerStatus(models.Model):
+    """Pulso del worker de ingesta, para la pantalla Conectividad.
+
+    El worker actualiza su fila cada pocos segundos. Si `last_heartbeat` es
+    antiguo, el worker está detenido aunque `broker_connected` diga lo contrario.
+    """
+
+    name = models.CharField("worker", max_length=40, primary_key=True)
+    started_at = models.DateTimeField("iniciado")
+    last_heartbeat = models.DateTimeField("último pulso")
+    broker_connected = models.BooleanField("conectado al broker", default=False)
+    last_message_at = models.DateTimeField("último mensaje", null=True, blank=True)
+    messages_accepted = models.BigIntegerField("mensajes aceptados", default=0)
+    messages_rejected = models.BigIntegerField("mensajes rechazados", default=0)
+
+    class Meta:
+        verbose_name = "estado del worker"
+        verbose_name_plural = "estado de los workers"
+
+    def __str__(self) -> str:
+        return self.name

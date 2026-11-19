@@ -15,7 +15,13 @@ Los tres identificadores son los que aparecen en el admin de Hail. Ejemplos:
 | Gateway de AguaPozo | `hail/aguapozo/aguapozo/cbox-01/telemetry` |
 | Medidor 1 de la ULagos | `hail/ulagos/medidores-electricos/med-01/telemetry` |
 
-Si la organización, el proyecto o el dispositivo no existen o están desactivados, el mensaje se descarta. Cada dispositivo tendrá usuario y contraseña propios en el broker y solo podrá publicar en su tópico.
+Si la organización, el proyecto o el dispositivo no existen o están desactivados, el mensaje se descarta.
+
+## Credenciales
+
+El broker no acepta conexiones anónimas. Cada dispositivo tiene **usuario y contraseña propios** (se definen en Admin → Dispositivos) y **solo puede publicar en su tópico**: si intenta publicar en otro, el broker descarta el mensaje. El usuario solo admite letras, números, punto, guion y guion bajo.
+
+La contraseña se guarda únicamente como hash; si se pierde, se define una nueva.
 
 **Recomendado:** QoS 1, sin `retain`.
 

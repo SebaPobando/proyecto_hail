@@ -67,7 +67,7 @@ TEMPLATES = [
 ]
 
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://hail:hail@localhost:5432/hail"),
+    "default": env.db("DATABASE_URL", default="postgres://hail:hail@127.0.0.1:5433/hail"),
 }
 # Reutiliza conexiones (el worker de ingesta vive mucho tiempo) y verifica que sigan vivas.
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("DJANGO_CONN_MAX_AGE", default=60)
@@ -106,9 +106,16 @@ DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="Hail <no-responde
 FRONTEND_URL = env("HAIL_FRONTEND_URL", default="http://localhost:5173")
 
 # Telemetría
-MQTT_URL = env("HAIL_MQTT_URL", default="mqtt://localhost:1883")
+MQTT_URL = env("HAIL_MQTT_URL", default="mqtt://127.0.0.1:1883")
 MQTT_USERNAME = env("HAIL_MQTT_USERNAME", default="")
 MQTT_PASSWORD = env("HAIL_MQTT_PASSWORD", default="")
+# Cuenta del simulador (solo desarrollo). Sin contraseña, no se crea en el broker.
+MQTT_SIMULATOR_USERNAME = env("HAIL_MQTT_SIMULATOR_USERNAME", default="hail-simulator")
+MQTT_SIMULATOR_PASSWORD = env("HAIL_MQTT_SIMULATOR_PASSWORD", default="")
+# Carpeta donde mqtt_sync_auth escribe passwd y acl (montada en el contenedor de Mosquitto).
+MQTT_AUTH_DIR = Path(env("HAIL_MQTT_AUTH_DIR", default=str(BASE_DIR.parent / "infra" / "mosquitto" / "config")))
+# Segundos sin mensajes tras los cuales un dispositivo o el worker se consideran fuera de línea.
+TELEMETRY_OFFLINE_SECONDS = env.int("HAIL_TELEMETRY_OFFLINE_SECONDS", default=60)
 # Segundos sin datos tras los cuales una lectura se informa como vencida.
 TELEMETRY_STALE_SECONDS = env.int("HAIL_TELEMETRY_STALE_SECONDS", default=30)
 

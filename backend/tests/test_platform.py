@@ -99,4 +99,4 @@ def test_admin_sets_mqtt_password_as_hash():
     assert response.status_code == 302, response.content[:2000]
     device.refresh_from_db()
     assert device.mqtt_username == "cbox-aguapozo"
-    assert device.mqtt_password_hash.startswith(("md5$", "pbkdf2_sha256$"))
+    assert device.mqtt_password_hash.startswith("$7$")  # formato de mosquitto_passwd

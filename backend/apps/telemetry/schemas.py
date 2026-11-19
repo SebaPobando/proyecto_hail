@@ -45,3 +45,28 @@ class HistoryOut(Schema):
 
 class ErrorOut(Schema):
     detail: str
+
+
+class WorkerOut(Schema):
+    online: bool
+    broker_connected: bool
+    last_heartbeat: datetime
+    last_message_at: datetime | None
+    # Solo para el administrador global: son totales de toda la plataforma.
+    messages_accepted: int | None = None
+    messages_rejected: int | None = None
+
+
+class DeviceStatusOut(Schema):
+    code: str
+    name: str
+    kind: str
+    last_seen_at: datetime | None
+    online: bool
+
+
+class ConnectivityOut(Schema):
+    server_time: datetime
+    offline_after_seconds: int
+    worker: WorkerOut | None
+    devices: list[DeviceStatusOut]

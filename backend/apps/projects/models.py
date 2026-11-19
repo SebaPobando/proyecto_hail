@@ -5,7 +5,7 @@ por `Project.objects.for_user(user)`. No consultes `Project.objects.all()`
 en código que responda a un usuario.
 """
 
-from django.contrib.auth.hashers import make_password
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
@@ -99,7 +99,14 @@ class Device(models.Model):
     kind = models.CharField("tipo", max_length=20, choices=Kind.choices, default=Kind.GATEWAY)
     hardware_model = models.CharField("modelo", max_length=120, blank=True)
     decoder = models.CharField("decodificador", max_length=30, choices=Decoder.choices, default=Decoder.UNSET)
-    mqtt_username = models.CharField("usuario MQTT", max_length=120, unique=True, null=True, blank=True)
+    mqtt_username = models.CharField(
+        "usuario MQTT",
+        max_length=120,
+        unique=True,
+        null=True,
+        blank=True,
+        validators=[RegexValidator(r"^[A-Za-z0-9._-]+$", "Solo letras, números, punto, guion y guion bajo.")],
+    )
     mqtt_password_hash = models.CharField("contraseña MQTT (hash)", max_length=256, blank=True, editable=False)
     last_seen_at = models.DateTimeField("último mensaje", null=True, blank=True, editable=False)
     is_active = models.BooleanField("activo", default=True)
@@ -118,7 +125,10 @@ class Device(models.Model):
         return f"hail/{self.project.organization.slug}/{self.project.slug}/{self.code}/telemetry"
 
     def set_mqtt_password(self, raw_password: str) -> None:
-        self.mqtt_password_hash = make_password(raw_password)
+        """Guarda la contraseña en el formato de Mosquitto (PBKDF2-SHA512); nunca en claro."""
+        from apps.telemetry.broker_auth import mosquitto_hash
+
+        self.mqtt_password_hash = mosquitto_hash(raw_password)
 
 
 class Signal(models.Model):

@@ -19,7 +19,7 @@ jobs:
           --health-cmd "pg_isready -U hail -d hail"
           --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      DATABASE_URL: postgres://hail:hail@localhost:5432/hail
+      HAIL_TEST_DATABASE_URL: postgres://hail:hail@localhost:5432/hail
     defaults:
       run:
         working-directory: backend

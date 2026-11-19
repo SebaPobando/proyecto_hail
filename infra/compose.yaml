@@ -12,14 +12,18 @@ services:
       POSTGRES_PASSWORD: hail
       POSTGRES_DB: hail
     ports:
-      - "127.0.0.1:5432:5432"
+      # 5433 en el equipo para no chocar con un PostgreSQL local (5432). Cámbialo con HAIL_DB_PORT.
+      - "127.0.0.1:${HAIL_DB_PORT:-5433}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hail -d hail"]
+      # Por TCP: durante la inicialización la imagen levanta un servidor temporal solo por socket
+      # local, así "healthy" significa que ya acepta conexiones de verdad.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U hail -d hail"]
       interval: 5s
       timeout: 3s
-      retries: 10
+      retries: 12
+      start_period: 20s
 
   redis:
     image: redis:7-alpine
@@ -29,10 +33,13 @@ services:
   mqtt:
     image: eclipse-mosquitto:2
     ports:
-      - "127.0.0.1:1883:1883"
+      - "127.0.0.1:${HAIL_MQTT_PORT:-1883}:1883"
     volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      # mosquitto.conf + passwd y acl generados con `python manage.py mqtt_sync_auth`
+      - ./mosquitto/config:/mosquitto/config:ro
       - mqtt-data:/mosquitto/data
+    # Si aún no existen passwd/acl el broker no arranca; se reintenta hasta que los generes.
+    restart: unless-stopped
 
   backend:
     profiles: ["app"]
@@ -58,6 +65,10 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.dev
       DATABASE_URL: postgres://hail:hail@db:5432/hail
       HAIL_MQTT_URL: mqtt://mqtt:1883
+    env_file:
+      # Credenciales MQTT de la cuenta de ingesta (HAIL_MQTT_USERNAME / HAIL_MQTT_PASSWORD)
+      - path: ../backend/.env
+        required: false
     volumes:
       - ../backend:/app
     depends_on:

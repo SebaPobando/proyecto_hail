@@ -10,6 +10,7 @@ Todos los datos llevan calidad "simulated".
 import random
 import time
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
@@ -35,7 +36,11 @@ class Command(BaseCommand):
 
         client = None
         if not options["direct"]:
-            client, host, port = build_client("hail-simulator")
+            client, host, port = build_client(
+                "hail-simulator",
+                username=settings.MQTT_SIMULATOR_USERNAME if settings.MQTT_SIMULATOR_PASSWORD else "",
+                password=settings.MQTT_SIMULATOR_PASSWORD,
+            )
             try:
                 client.connect(host, port, keepalive=30)
             except OSError as error:
