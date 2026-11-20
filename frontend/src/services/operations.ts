@@ -18,10 +18,12 @@ export const assets: Asset[] = [
     id: `MED-0${i + 1}`, name, category: 'Medición eléctrica', project: 'medidores-electricos', source: 'Catálogo de medidores',
   })),
   ...[
-    ['TC-01', 'Tecle eléctrico'], ['BB-01', 'Descargador big bag'], ['TZ-01', 'Tamizador 1'], ['TZ-02', 'Tamizador 2'],
-    ['ES-01', 'Esclusa 1'], ['ES-02', 'Esclusa 2'], ['ES-03', 'Esclusa superior'], ['DH-01', 'Deshumidificador'],
-    ['SP-01', 'Soplador'], ['MZ-01', 'Mezcladora'], ['EN-01', 'Ensacadora'],
-  ].map(([id, name]) => ({ id, name, category: 'Proceso', project: 'nutrial', source: 'Referencia de ingeniería Nutrial' })),
+    ['TC-01', 'Tecle eléctrico'], ['BB-01', 'Descargador big bag'], ['TV-01', 'Tolva de descarga manual de sacos'],
+    ['TZ-01', 'Tamizador 1 · Italvibras MVSI 3/300'], ['TZ-02', 'Tamizador 2'], ['ES-01', 'Esclusa · Bühler MPSH-LP'],
+    ['ES-02', 'Esclusa 2'], ['ES-03', 'Esclusa superior'], ['DH-01', 'Deshumidificador · Trotec TTR 800'],
+    ['SP-01', 'Soplador de lóbulos · Repicky'], ['MZ-01', 'Mezcladora · Bühler DFML-1000'], ['ES-04', 'Esclusa inferior'],
+    ['EN-01', 'Ensacadora · Bühler MWPF-W'],
+  ].map(([id, name]) => ({ id, name, category: 'Proceso', project: 'nutrial', source: 'Diagrama PROYEC 01-2026 Rev. C' })),
 ];
 
 const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
