@@ -42,6 +42,13 @@ class TestLogin:
         assert post(client, "/api/auth/logout", {}, token).status_code == 204
         assert client.get("/api/auth/me").status_code == 401
 
+    def test_login_accepts_reserved_local_domains(self, django_user_model):
+        """Las cuentas de desarrollo usan @hail.local, un dominio reservado."""
+        django_user_model.objects.create_user(email="cliente-demo@hail.local", password=PASSWORD)
+        client, token = csrf_client()
+        response = post(client, "/api/auth/login", {"email": "cliente-demo@hail.local", "password": PASSWORD}, token)
+        assert response.status_code == 200
+
     def test_logout_with_session_but_without_csrf_is_rejected(self, user_a):
         client = Client(enforce_csrf_checks=True)
         client.force_login(user_a)

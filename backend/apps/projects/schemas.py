@@ -44,7 +44,20 @@ class SignalOut(ModelSchema):
 
     class Meta:
         model = Signal
-        fields = ["tag", "description", "kind", "unit", "min_value", "max_value", "decimals", "address", "position"]
+        fields = [
+            "tag",
+            "description",
+            "kind",
+            "unit",
+            "min_value",
+            "max_value",
+            "decimals",
+            "address",
+            "module",
+            "field_device",
+            "logic",
+            "position",
+        ]
 
     @staticmethod
     def resolve_device(obj) -> str | None:

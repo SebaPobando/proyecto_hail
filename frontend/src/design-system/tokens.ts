@@ -1,6 +1,6 @@
 /**
  * Espejo en TypeScript de tokens.css, para gráficos (Recharts) y SVG donde no
- * conviene usar variables CSS. scripts/verify-design-tokens.mjs comprueba que
+ * conviene usar variables CSS. tokens.test.ts comprueba que
  * ambos archivos coincidan.
  */
 export const color = {

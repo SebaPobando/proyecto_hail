@@ -1,3 +1,5 @@
+> **Documento histórico.** Describe el prototipo con Firebase, retirado en la fase F3. Se conserva porque sus verificaciones (vigencia de datos, calidad, exportaciones, permisos) siguen siendo la lista de chequeo para la puesta en producción (F5).
+
 # Preparación para entrega a clientes
 
 ## Implementado localmente

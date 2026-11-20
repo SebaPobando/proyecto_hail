@@ -1,8 +1,0 @@
-node_modules
-dist
-.git
-.iot-data
-.env*
-capturas
-referencias
-*.tsbuildinfo

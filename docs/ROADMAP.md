@@ -10,6 +10,18 @@ Versión completa, con criterios de cierre por fase y riesgos: [documento del ro
 | F3 · Frontend a la API | 7 a 8 | Adaptadores en `src/services`, sesión Django, catálogo dinámico | Cliente ve solo su proyecto |
 | F4 · Alarmas y operación | 9 a 12 | Reglas de alarma, notificaciones, seguimiento compartido, WebSocket | Alarma notifica y se reconoce |
 | F5 · Producción y piloto | 13 a 14 | Servidores, TLS, respaldos, observabilidad, piloto en paralelo | AguaPozo real en producción |
-| F6 · Retiro de Firebase | 15 a 16 | Migración de datos y usuarios, limpieza de legado | Firebase apagado |
+| F6 · Retiro de Firebase | — | Adelantado a F3: no había usuarios ni datos reales que migrar | Firebase y Vercel fuera del repo |
 
 Las semanas son de trabajo efectivo, no fechas de calendario.
+
+## Estado
+
+| Fase | Estado | Pendiente |
+| --- | --- | --- |
+| F0 | Listo | Capturar la trama real de la CBOX |
+| F1 | Listo | — |
+| F2 | Listo | Definir la retención del dato crudo con cada cliente |
+| F3 | Listo | Conectar el PLC de Nutrial (su esquema de proceso sigue simulado en el navegador) |
+| F4 | Siguiente | Alarmas, avisos y bitácora compartida en el backend; tiempo real por WebSocket |
+| F5 | Pendiente | — |
+| F6 | Listo (en F3) | — |

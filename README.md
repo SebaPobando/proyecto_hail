@@ -106,17 +106,17 @@ La plataforma está construida, pero hay decisiones que **no deben tomarse desde
 
 ## Estado del proyecto y próximos pasos
 
-Estamos migrando la plataforma desde un prototipo (Node + Firebase) a una base profesional preparada para varios clientes. El plan completo está en el [roadmap](docs/ROADMAP.md).
+La plataforma ya dejó atrás el prototipo (Node + Firebase): hoy todo corre sobre una base profesional preparada para varios clientes. El plan completo está en el [roadmap](docs/ROADMAP.md).
 
 | Fase | Qué incluye | Estado |
 | --- | --- | --- |
 | F0 · Preparación | Orden del proyecto, entorno de desarrollo, pruebas automáticas | **Listo** (falta capturar la trama real de la CBOX) |
 | F1 · Plataforma multicliente | Clientes, usuarios, permisos, proyectos, equipos y señales administrables; registro de auditoría | **Listo** |
 | F2 · Recepción de datos | Broker MQTT, validación, base de datos de series de tiempo, historial | **Listo** (falta definir cuánto tiempo se guardan los datos crudos) |
-| F3 · Pantallas conectadas | Las HMI actuales leen desde la nueva plataforma | Pendiente |
+| F3 · Pantallas conectadas | Las HMI leen desde la nueva plataforma; inicio de sesión propio; cada cliente ve solo lo suyo | **Listo** |
 | F4 · Operación | Alarmas configurables, avisos por correo o mensajería, bitácora compartida | Pendiente |
 | F5 · Producción | Servidor, cifrado, respaldos, monitoreo; piloto con AguaPozo en datos reales | Pendiente |
-| F6 · Cierre de migración | Retiro del prototipo | Pendiente |
+| F6 · Cierre de migración | Retiro del prototipo y de Firebase | **Listo** (se adelantó a F3: Firebase no tenía usuarios reales) |
 
 Para ser claros: **hoy los datos que se ven son simulados o de ejemplo.** La primera instalación con datos reales está planificada para la fase F5.
 
@@ -138,7 +138,7 @@ Esta sección es para quien desarrolla o despliega la plataforma.
 
 | Capa | Tecnología |
 | --- | --- |
-| Pantallas (frontend) | React 19 + TypeScript + Vite |
+| Pantallas (frontend) | React 19 + TypeScript + Vite; pruebas con Vitest |
 | API y administración | Python · Django 5.2 + Django Ninja |
 | Base de datos | PostgreSQL + TimescaleDB (series de tiempo) |
 | Mensajería con equipos | MQTT (Mosquitto en desarrollo) |
@@ -161,7 +161,7 @@ project_hail/
 │   │   └── audit/      registro de auditoría
 │   ├── templates/      correos
 │   └── tests/          pruebas de aislamiento, autenticación y plataforma
-├── frontend/           pantallas React (HMI actuales)
+├── frontend/           pantallas React: portal, HMI y cliente de la API
 ├── infra/              servicios de desarrollo (base de datos, Redis, broker)
 ├── docs/               roadmap, arquitectura, decisiones, guía de prueba local
 ├── scripts/            instalación e inicio con doble clic (Windows)
@@ -251,14 +251,16 @@ npm.cmd run dev
 
 | Dirección | Qué se ve |
 | --- | --- |
-| http://127.0.0.1:5173/?source=portal | Las pantallas: portal con AguaPozo, Medidores ULagos y Nutrial (datos de demostración) |
-| http://localhost:8000/admin/ | Administración: organizaciones, proyectos, equipos, señales, usuarios. Entra con la cuenta del paso 3 |
-| http://localhost:8000/admin/telemetry/latestreading/ | Lecturas que va dejando el simulador, actualizadas cada 10 s |
-| http://localhost:8000/api/docs | La API con documentación interactiva |
+| http://127.0.0.1:5173/ | Las pantallas de Hail. Entra con la cuenta del paso 3 (ve todos los proyectos) o con un usuario de cliente |
+| http://127.0.0.1:5173/admin/ | Administración: organizaciones, proyectos, equipos, señales, usuarios. Comparte la sesión con las pantallas |
+| http://127.0.0.1:5173/admin/telemetry/latestreading/ | Lecturas que va dejando el simulador, actualizadas cada 10 s |
+| http://127.0.0.1:8000/api/docs | La API con documentación interactiva |
 
 Usuarios de cliente para probar el aislamiento entre proyectos: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local`, todos con contraseña `hail-demo-2026` (solo en desarrollo). Cada uno ve únicamente su proyecto.
 
-> **Ojo:** hasta la fase F3 las pantallas usan el prototipo con datos de demostración y todavía no leen del backend. Lo que llega del simulador se ve en la administración y en la API.
+En desarrollo, Vite reenvía `/api`, `/admin` y `/static` al backend (`frontend/vite.config.ts`): el navegador ve un solo sitio y una misma sesión sirve para las pantallas y la administración.
+
+> **Ojo:** AguaPozo y los medidores muestran lo que escribe el simulador. El esquema de proceso de Nutrial sigue simulado en el navegador hasta conectar su PLC; su lista de señales sí viene del backend.
 
 ### Los días siguientes
 
@@ -286,6 +288,7 @@ cd frontend; npm.cmd install; npm.cmd run dev
 | `No module named 'django'` | El entorno no está activado. Corre `.\.venv\Scripts\Activate.ps1` dentro de `backend` (el prompt debe decir `(.venv)`). |
 | `python` abre la Microsoft Store o no se reconoce | Python no quedó en el PATH. Reinstálalo marcando "Add python.exe to PATH", o usa `py -3.12` en vez de `python`. |
 | `ports are not available ... 5432` o `la autentificación password falló para el usuario hail` | Hay un PostgreSQL instalado en el equipo usando el 5432. La base de Docker usa el **5433**: revisa que `DATABASE_URL` en `backend\.env` diga `127.0.0.1:5433`. |
+| Las pantallas dicen "No se pudo contactar al servidor de Hail" | El backend no está corriendo: revisa la terminal 1 (`runserver`) o la ventana "Hail - Backend". |
 | `server closed the connection unexpectedly` al hacer `migrate` | La base aún se estaba inicializando (la primera vez tarda unos segundos y se reinicia por dentro). Levántala con `--wait` o espera a que `docker compose -f infra/compose.yaml ps` diga `healthy`, y repite `migrate`. |
 | `error during connect` o `docker daemon is not running` | Docker Desktop no está abierto. Ábrelo y espera a que diga "Engine running". |
 | El simulador dice "No hay broker" o el contenedor `mqtt` se reinicia | Faltan los archivos de usuarios del broker: corre `python manage.py mqtt_sync_auth` (necesita la base arriba). |
@@ -315,8 +318,12 @@ Para dar acceso a un equipo de campo: Admin → Dispositivos → usuario MQTT y 
 
 ```powershell
 cd backend
-pytest              # pruebas automáticas
+pytest              # pruebas automáticas del backend
 ruff check .        # revisión de estilo y errores
+
+cd ..\frontend
+npm.cmd test        # pruebas automáticas de las pantallas (Vitest)
+npm.cmd run build   # compilación de producción (incluye la revisión de tipos)
 ```
 
 Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para correrlas contra PostgreSQL, define `HAIL_TEST_DATABASE_URL` (en integración continua corren contra PostgreSQL + TimescaleDB).
@@ -327,6 +334,6 @@ Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para corr
 - [Roadmap](docs/ROADMAP.md): fases, entregables y fechas estimadas.
 - [Arquitectura](docs/ARQUITECTURA.md): componentes, modelo de datos, API y convenciones del código.
 - [Protocolo MQTT](docs/PROTOCOLO_MQTT.md): cómo debe publicar un equipo de campo; qué falta de la CBOX.
-- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system.
+- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system, sesión y mismo origen.
 - [Design system](frontend/src/design-system/README.md): reglas de color, tipografía, estados y componentes.
-- [Operación del prototipo](docs/legacy/OPERACION.md): verificaciones pendientes antes de operar con equipos reales.
+- [Operación del prototipo](docs/legacy/OPERACION.md): documento histórico; sirve como lista de verificaciones para la fase F5.

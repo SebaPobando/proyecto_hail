@@ -1,14 +1,19 @@
 from ninja import Schema
-from pydantic import EmailStr
+from pydantic import Field
+
+# El correo de login y de recuperación no se valida como dirección entregable:
+# basta con buscar la cuenta. EmailStr rechaza dominios reservados como
+# `.local`, que usan las cuentas de desarrollo (cliente-aguapozo@hail.local).
+Email = Field(min_length=3, max_length=254)
 
 
 class LoginIn(Schema):
-    email: EmailStr
-    password: str
+    email: str = Email
+    password: str = Field(max_length=4096)
 
 
 class PasswordResetIn(Schema):
-    email: EmailStr
+    email: str = Email
 
 
 class PasswordResetConfirmIn(Schema):

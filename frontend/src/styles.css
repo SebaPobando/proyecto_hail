@@ -14,7 +14,7 @@
 }
 nav .nav-icon{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.8}
 
-.firebase-login {
+.access-form {
   display: grid;
   gap: 16px;
   max-width: 420px;
@@ -24,7 +24,7 @@ nav .nav-icon{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:
   border-radius: 10px;
   background: #0b2739;
 }
-.firebase-login h2 { margin: 0; }
-.firebase-login label { display: grid; gap: 6px; }
-.firebase-login input, .firebase-login button { font: inherit; padding: 10px; }
-.firebase-login button { cursor: pointer; }
+.access-form h2 { margin: 0; }
+.access-form label { display: grid; gap: 6px; }
+.access-form input, .access-form button { font: inherit; padding: 10px; }
+.access-form button { cursor: pointer; }

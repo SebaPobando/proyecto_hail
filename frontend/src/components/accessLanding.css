@@ -6,10 +6,10 @@ body:has(.access-landing), body:has(.access-loading) { min-width: 0; }
 .access-brand h1 { font-size:34px; font-weight:600; letter-spacing:-.7px; margin:0; line-height:1.2; }
 .access-brand p { margin:8px 0 0; font-size:13px; color:#d5e4f6; letter-spacing:.3px; }
 .access-form-area { padding:28px 32px 32px; }
-.access-card .firebase-login { display:grid; gap:19px; max-width:none; margin:0; padding:0; background:transparent; border:0; }
+.access-card .access-form { display:grid; gap:19px; max-width:none; margin:0; padding:0; background:transparent; border:0; }
 .access-card h2 { margin:0; text-align:center; font-size:23px; color:var(--color-primary-strong); }
 .access-card .access-form-subtitle { margin:-9px 0 3px; text-align:center; font-size:14px; color:var(--color-text-muted); line-height:1.5; }
-.access-card .firebase-login label { display:grid; gap:7px; color:var(--color-text-muted); font-size:13px; }
+.access-card .access-form label { display:grid; gap:7px; color:var(--color-text-muted); font-size:13px; }
 .access-card input { width:100%; min-width:0; padding:12px 13px; min-height:47px; color:var(--color-text); background:white; border:1px solid var(--color-border); border-radius:7px; font:inherit; font-size:16px; }
 .access-card input:focus-visible { outline:2px solid var(--color-primary); outline-offset:1px; }
 .access-card button { min-height:46px; padding:11px 16px; background:var(--color-primary); color:white; border:1px solid var(--color-primary); border-radius:7px; font:inherit; font-size:15px; font-weight:600; cursor:pointer; }
@@ -22,3 +22,5 @@ body:has(.access-landing), body:has(.access-loading) { min-width: 0; }
 .access-loading { min-height:100svh; display:grid; place-items:center; background:var(--color-bg); color:var(--color-text); }
 @media(max-width:480px) { .access-landing { padding:20px 16px; } .access-form-area { padding:25px 22px; } .access-brand { padding:25px 20px; } }
 @media(max-height:700px) { .access-landing { padding-top:16px; } .access-brand { padding:20px; } .access-footer { padding-top:20px; } }
+.access-card .access-notice { margin: 0; padding: 10px 12px; border-radius: 6px; background: var(--color-surface-brand); color: var(--color-primary-strong); font-size: 13px; }
+.access-form-area > button { width: 100%; margin-top: 12px; }

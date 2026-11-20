@@ -103,7 +103,7 @@ EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.c
 DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="Hail <no-responder@hail.local>")
 
 # URL pública del frontend; se usa en los enlaces de los correos.
-FRONTEND_URL = env("HAIL_FRONTEND_URL", default="http://localhost:5173")
+FRONTEND_URL = env("HAIL_FRONTEND_URL", default="http://127.0.0.1:5173")
 
 # Telemetría
 MQTT_URL = env("HAIL_MQTT_URL", default="mqtt://127.0.0.1:1883")

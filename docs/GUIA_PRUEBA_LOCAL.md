@@ -8,7 +8,7 @@ Esta guía es para levantar Hail en un computador con Windows **sin saber progra
 
 ## Qué vas a tener al final
 
-- **Las pantallas de Hail** en el navegador: el portal con los tres proyectos de ejemplo (AguaPozo, Medidores ULagos y Nutrial).
+- **Las pantallas de Hail** en el navegador, con inicio de sesión: el portal con los tres proyectos de ejemplo (AguaPozo, Medidores ULagos y Nutrial).
 - **La administración**: donde se ven y editan los clientes, proyectos, equipos de campo, señales y las lecturas que van llegando.
 - **Un simulador** que inventa lecturas cada 10 segundos, como si hubiera equipos enviando datos.
 
@@ -69,7 +69,7 @@ Si aparece un texto en rojo que dice **ERROR**, mira [Si algo falla](#si-algo-fa
 En la carpeta `proyecto_hail`, haz **doble clic en `iniciar.cmd`**.
 
 1. Se abren **tres ventanas nuevas**: "Hail - Backend", "Hail - Simulador de datos" y "Hail - Pantallas". Son las partes de Hail funcionando. **No las cierres mientras lo uses** (puedes minimizarlas).
-2. Cuando todo responda, se abren solas dos pestañas en el navegador: las **pantallas** y la **administración**.
+2. Cuando todo responda, se abre sola una pestaña del navegador con la pantalla de **inicio de sesión** de Hail. Entra con el correo y la contraseña del paso 3.
 3. La primera ventana (la de `iniciar.cmd`) ya se puede cerrar.
 
 Si Windows pregunta si permites el acceso de Python o Node.js en el firewall, puedes darle **Cancelar**: Hail funciona solo dentro de tu computador.
@@ -78,19 +78,20 @@ Si Windows pregunta si permites el acceso de Python o Node.js en el firewall, pu
 
 ## Paso 5 · Qué mirar
 
-### Las pantallas — http://127.0.0.1:5173/?source=portal
+### Las pantallas — http://127.0.0.1:5173/
 
-El portal con los tres proyectos. Entra a cada uno:
+Entra con tu cuenta de administrador: ves los tres proyectos. Recorre cada uno:
 
-- **AguaPozo**: HMI de un pozo con estanques, bomba y dosificación de cloro.
-- **Medidores ULagos**: resumen eléctrico de los medidores (tensiones, corrientes, potencias, energía).
-- **Nutrial**: variables de proceso de la planta.
+- **AguaPozo**: HMI de un pozo con estanque, bomba y dosificación de cloro. Los valores cambian cada pocos segundos (vienen del simulador). En **Tendencias** se ve el historial guardado.
+- **Medidores Eléctricos**: resumen de los cinco medidores. Tres están "en línea" y dos "sin comunicación", a propósito. Pincha un medidor para ver su historial y en **Reportes** genera un resumen del día.
+- **Nutrial**: el esquema del proceso todavía es una simulación del navegador (su PLC no está conectado). En **Equipos y señales** está la lista de E/S real, que viene de la base de datos.
+- **Conectividad** (menú izquierdo): qué equipos están enviando datos y cuándo llegó lo último.
 
-> Por ahora las pantallas muestran **datos de demostración propios**. En la próxima fase (F3) se conectan al backend y mostrarán lo que llega de los equipos, con inicio de sesión por cliente.
+**Prueba el aislamiento entre clientes.** Cierra sesión (arriba a la derecha) y entra como un cliente, por ejemplo `cliente-aguapozo@hail.local` con la contraseña `hail-demo-2026`. Ese usuario solo ve AguaPozo: los otros proyectos no aparecen ni escribiendo su dirección. Los otros clientes de prueba son `cliente-ulagos@hail.local` y `cliente-nutrial@hail.local` (misma contraseña).
 
-### La administración — http://127.0.0.1:8000/admin/
+### La administración — botón "Administración" arriba a la derecha (o http://127.0.0.1:5173/admin/)
 
-Entra con el correo y la contraseña del paso 3. Lo más interesante:
+Usa la misma sesión de las pantallas: si ya entraste como administrador, no vuelve a pedir la contraseña. Lo más interesante:
 
 | Sección | Qué hay |
 | --- | --- |
@@ -139,6 +140,8 @@ Lo primero: **una captura de la ventana con el error se la mandas a Seba**. Ante
 | "el backend no partió" | Mira la ventana "Hail - Backend". Si dice `That port is already in use`, hay otra copia de Hail abierta: cierra todas las ventanas "Hail - …" y vuelve a abrir con `iniciar.cmd`. Si no, reinicia el computador y prueba de nuevo. |
 | "las pantallas no partieron" | Mira la ventana "Hail - Pantallas". Si dice que el puerto 5173 está ocupado, cierra todas las ventanas "Hail - …" y vuelve a abrir. |
 | Windows muestra "Windows protegió su PC" al abrir un `.cmd` | Pasa si el proyecto se descargó como ZIP. Clic en **Más información → Ejecutar de todas formas**. |
+| La pantalla de Hail dice "No se pudo contactar al servidor de Hail" | La ventana "Hail - Backend" está cerrada o tuvo un error. Cierra las ventanas de Hail y vuelve a abrir con `iniciar.cmd`. |
+| "Correo o contraseña incorrectos" con un usuario `cliente-…` | Esos usuarios se crean con la contraseña `hail-demo-2026`. Si alguien la cambió, en la administración (Usuarios) se puede poner otra. |
 | La página dice "No se puede acceder a este sitio" | Las ventanas de Hail están cerradas o todavía partiendo. Espera unos segundos y recarga, o vuelve a abrir con `iniciar.cmd`. |
 | Olvidaste la contraseña de administrador | Pídele a Seba el comando para cambiarla (`python manage.py changepassword tu@correo`). |
 

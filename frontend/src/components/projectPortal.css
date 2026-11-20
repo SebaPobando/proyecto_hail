@@ -172,3 +172,10 @@ body:has(.project-portal) { min-width: 0; }
 @media(min-width:1600px) { .portal-content { padding: 32px 44px; } .project-card > img { max-height: 250px; } }
 @media(max-width:1100px) { .portal-header { margin-left: 210px; } .portal-sidebar { width: 210px; } .portal-layout { grid-template-columns: 210px minmax(0,1fr); } .portal-content { padding: 22px; } .portal-summary { grid-template-columns: 1fr; gap: 8px; } .portal-summary > div { display:flex; justify-content:space-between; align-items:center; } .portal-summary strong { font-size: 16px; } .stage-tabs { grid-template-columns: 1fr 1fr; } }
 @media(max-width:740px) { .portal-header { margin-left:0; padding:16px; } .portal-layout { display:block; } .portal-sidebar { position:static; width:auto; padding:12px 16px; display:block; } .portal-brand,.sidebar-footer { display:none; } .portal-sidebar .portal-menu { gap: 4px; } .portal-menu button { font-size:12px; min-height:38px; } .portal-content { padding:20px 16px; } .electrical-gauges { grid-template-columns:1fr; } .nutrial-detail { grid-template-columns:1fr; } }
+
+/* HMI genérica: tabla de lectura actual */
+.generic-hmi { display: grid; gap: var(--space-4); }
+.generic-hmi-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); }
+.generic-hmi-header h2 { margin: 0; }
+.generic-hmi-header p { margin: var(--space-1) 0 0; color: var(--color-text-muted); }
+.generic-hmi .is-stale td { color: var(--color-text-subtle); }

@@ -4,7 +4,7 @@
 
 | Componente | Tecnología | Estado |
 | --- | --- | --- |
-| Frontend (HMI, portal) | React 19 + TypeScript + Vite | Existente; se conecta a la API en F3 |
+| Frontend (HMI, portal) | React 19 + TypeScript + Vite | F3 (listo): sesión de Django y datos de la API |
 | API y administración | Django 5.2 + Django Ninja | F1 |
 | Base de datos | PostgreSQL + TimescaleDB | F1 (relacional), F2 (hypertable de lecturas) |
 | Broker MQTT | Mosquitto en desarrollo; producción por decidir (EMQX o Mosquitto) | F2 |
@@ -96,12 +96,30 @@ Pendiente: plazo de retención y compresión del dato crudo (decisión de ingeni
 
 ## Frontend
 
-`frontend/` es la app existente, copiada sin cambios para que siga compilando y desplegando. Las piezas marcadas como legado se retiran en F6:
+`frontend/` es una SPA de React que solo habla con la API de Hail. Firebase, el servidor Node del prototipo y el despliegue en Vercel se retiraron en F3.
 
-- `frontend/server/` (broker aedes, backend SQLite, puente Firebase, publicador)
-- `frontend/scripts/iot-local.mjs` y `frontend/scripts/manage-project-access.mjs`
-- `frontend/firebase.json`, `frontend/database.rules.json`, `src/services/firebase.ts`, `FirebaseSession.tsx`
-- `frontend/Dockerfile`, `frontend/compose.yaml` y `frontend/deploy/` (despliegue de prueba anterior)
+**Un solo origen.** El navegador ve las pantallas, `/api` y `/admin` en el mismo sitio: en desarrollo los une el proxy de Vite (`vite.config.ts`); en producción lo hará Caddy (F5). Así la cookie de sesión de Django funciona sin CORS y una sola sesión sirve para las pantallas y la administración. Ver [ADR 0005](adr/0005-sesion-mismo-origen.md).
+
+| Archivo | Responsabilidad |
+| --- | --- |
+| `src/services/api.ts` | `fetch` con cookie de sesión, encabezado `X-CSRFToken` (leído de la cookie en cada petición, porque Django lo rota al iniciar sesión), tiempo máximo de espera y aviso global de 401 |
+| `src/services/hail.ts` | Endpoints y tipos de la API (reflejo de los `schemas.py` del backend) |
+| `src/services/usePolling.ts` | Consulta periódica sin superposición; conserva el último dato si una consulta falla |
+| `src/services/aguapozo.ts`, `meters.ts` | Adaptadores: convierten lecturas e historial de la API al formato de cada HMI |
+| `src/services/projectStatus.ts` | Estado de datos por proyecto: en línea, simulación, datos antiguos, sin datos |
+| `src/components/Session.tsx` | Login, recuperación y nueva contraseña (`#reset?uid=…&token=…`), sesión vencida |
+| `src/components/ProjectPortal.tsx` | Catálogo desde `/api/projects`; el `hmi_type` de cada proyecto elige la pantalla |
+
+**Pantalla por tipo de HMI.** `aguapozo` → `WaterHmi`, `electrical` → `ElectricalOverview`, `nutrial` → `NutrialHmi`, `generic` → `GenericHmi` (tabla de lectura actual). Un proyecto nuevo funciona con la genérica sin tocar el frontend; cada pantalla se descarga recién al abrirla.
+
+**Reglas de presentación.**
+
+- Una lectura vencida (`stale`) nunca se muestra como valor actual: aparece "—" o la etiqueta "Datos antiguos".
+- Un intervalo de historial sin datos es un hueco en el gráfico, no un cero.
+- Lo simulado siempre se rotula como simulado.
+- Las alarmas de campo dicen explícitamente que llegan en F4; una tabla vacía no significa "sin alarmas".
+
+**Pruebas.** `npm test` corre Vitest sobre los adaptadores, el cliente de la API, el cálculo de estados y el render de las pantallas principales.
 
 ## Convenciones del código
 

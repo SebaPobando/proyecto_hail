@@ -71,5 +71,5 @@ import { Button, StatusBadge, Alert, Kpi, Field, Card, HailLogo, tokens } from '
 ## Verificación
 
 ```powershell
-node scripts/verify-design-tokens.mjs   # tokens.css y tokens.ts coinciden
+npm.cmd test -- tokens   # tokens.css y tokens.ts coinciden (src/design-system/tokens.test.ts)
 ```

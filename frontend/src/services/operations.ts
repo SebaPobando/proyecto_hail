@@ -1,12 +1,60 @@
-import type { ProjectId } from '../components/ProjectPortal';
-export const installationNames: Record<ProjectId,string> = {aguapozo:'AguaPozo','medidores-electricos':'Medidores Eléctricos',nutrial:'Nutrial'};
-export type Asset = {id:string;project:ProjectId;name:string;category:string;source:string};
-export const assets:Asset[] = [
- ...[['P-101','Bomba sumergible','Bombeo'],['LT-101','Nivel de estanque','Instrumentación'],['LT-102','Nivel de pozo','Instrumentación'],['FT-101','Caudalímetro','Instrumentación'],['AIT-101','Analizador de cloro','Instrumentación'],['D-101','Dosificación','Tratamiento']].map(([id,name,category])=>({id,name,category,project:'aguapozo' as const,source:'Ingeniería AguaPozo'})),
- ...['Accuenergy Acuvim II-R','Schneider PM5330','CHINT PD7777','CHINT PD666','CHINT PD666'].map((name,i)=>({id:`MED-0${i+1}`,name,category:'Medición eléctrica',project:'medidores-electricos' as const,source:'Catálogo de demostración'})),
- ...[['TC-01','Tecle eléctrico'],['BB-01','Descargador big bag'],['TZ-01','Tamizador 1'],['TZ-02','Tamizador 2'],['ES-01','Esclusa 1'],['ES-02','Esclusa 2'],['ES-03','Esclusa superior'],['DH-01','Deshumidificador'],['SP-01','Soplador'],['MZ-01','Mezcladora'],['EN-01','Ensacadora']].map(([id,name])=>({id,name,category:'Proceso',project:'nutrial' as const,source:'Referencia de ingeniería Nutrial'})),
+/**
+ * Inventario de referencia y bitácora local del centro de operaciones.
+ *
+ * El inventario es la lista de equipos de ingeniería de cada instalación (no
+ * los dispositivos que envían datos, que vienen de la API). La bitácora se
+ * guarda en el navegador hasta que exista en el backend.
+ */
+export type Asset = { id: string; project: string; name: string; category: string; source: string };
+
+export const assets: Asset[] = [
+  ...[
+    ['P-101', 'Bomba sumergible', 'Bombeo'],
+    ['LT-101', 'Nivel de estanque', 'Instrumentación'],
+    ['LT-102', 'Nivel de pozo', 'Instrumentación'],
+    ['FT-101', 'Caudalímetro', 'Instrumentación'],
+    ['AIT-101', 'Analizador de cloro', 'Instrumentación'],
+    ['D-101', 'Dosificación', 'Tratamiento'],
+  ].map(([id, name, category]) => ({ id, name, category, project: 'aguapozo', source: 'Ingeniería AguaPozo' })),
+  ...['Accuenergy Acuvim II-R', 'Schneider PM5330', 'CHINT PD7777', 'CHINT PD666', 'CHINT PD666'].map((name, i) => ({
+    id: `MED-0${i + 1}`, name, category: 'Medición eléctrica', project: 'medidores-electricos', source: 'Catálogo de medidores',
+  })),
+  ...[
+    ['TC-01', 'Tecle eléctrico'], ['BB-01', 'Descargador big bag'], ['TZ-01', 'Tamizador 1'], ['TZ-02', 'Tamizador 2'],
+    ['ES-01', 'Esclusa 1'], ['ES-02', 'Esclusa 2'], ['ES-03', 'Esclusa superior'], ['DH-01', 'Deshumidificador'],
+    ['SP-01', 'Soplador'], ['MZ-01', 'Mezcladora'], ['EN-01', 'Ensacadora'],
+  ].map(([id, name]) => ({ id, name, category: 'Proceso', project: 'nutrial', source: 'Referencia de ingeniería Nutrial' })),
 ];
-export type WorkItem = {id:string;project:ProjectId;asset:string;title:string;priority:'Normal'|'Alta';status:'Pendiente'|'En atención'|'Resuelto';owner:string;due:string;created:string;events:{at:string;text:string}[]};
-export function searchAssets(allowed:ProjectId[],project:string,search:string){const norm=(s:string)=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return assets.filter(a=>allowed.includes(a.project)&&(project==='all'||a.project===project)&&norm(`${a.id} ${a.name} ${a.category}`).includes(norm(search)));}
-export function validWorkItem(v:unknown):v is WorkItem{if(!v||typeof v!=='object')return false;const r=v as WorkItem;return typeof r.id==='string'&&Object.hasOwn(installationNames,r.project)&&typeof r.asset==='string'&&typeof r.title==='string'&&['Normal','Alta'].includes(r.priority)&&['Pendiente','En atención','Resuelto'].includes(r.status)&&typeof r.owner==='string'&&typeof r.due==='string'&&typeof r.created==='string'&&Array.isArray(r.events)&&r.events.every(e=>typeof e.at==='string'&&typeof e.text==='string');}
-export function readWorkItems(key:string):WorkItem[]{try{const raw=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(raw)?raw.filter(validWorkItem):[];}catch{return [];}}
+
+export type WorkItem = {
+  id: string; project: string; asset: string; title: string;
+  priority: 'Normal' | 'Alta'; status: 'Pendiente' | 'En atención' | 'Resuelto';
+  owner: string; due: string; created: string; events: { at: string; text: string }[];
+};
+
+const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+export function searchAssets(allowed: readonly string[], project: string, search: string) {
+  return assets.filter(asset => allowed.includes(asset.project)
+    && (project === 'all' || asset.project === project)
+    && normalize(`${asset.id} ${asset.name} ${asset.category}`).includes(normalize(search)));
+}
+
+export function validWorkItem(value: unknown): value is WorkItem {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as WorkItem;
+  return typeof item.id === 'string' && typeof item.project === 'string' && typeof item.asset === 'string'
+    && typeof item.title === 'string' && ['Normal', 'Alta'].includes(item.priority)
+    && ['Pendiente', 'En atención', 'Resuelto'].includes(item.status)
+    && typeof item.owner === 'string' && typeof item.due === 'string' && typeof item.created === 'string'
+    && Array.isArray(item.events) && item.events.every(event => typeof event.at === 'string' && typeof event.text === 'string');
+}
+
+export function readWorkItems(key: string): WorkItem[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(raw) ? raw.filter(validWorkItem) : [];
+  } catch {
+    return [];
+  }
+}

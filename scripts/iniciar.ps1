@@ -10,8 +10,8 @@ $VenvPython = Join-Path $Backend '.venv\Scripts\python.exe'
 
 $UrlSalud = 'http://127.0.0.1:8000/api/health'
 $UrlPantallas = 'http://127.0.0.1:5173/'
-$UrlPortal = 'http://127.0.0.1:5173/?source=portal'
-$UrlAdmin = 'http://127.0.0.1:8000/admin/'
+$UrlPortal = 'http://127.0.0.1:5173/'
+$UrlAdmin = 'http://127.0.0.1:5173/admin/'
 
 function Falla($texto) {
     Write-Host ''
@@ -80,11 +80,10 @@ if (Responde $UrlSalud) {
 }
 
 Start-Process $UrlPortal
-Start-Process $UrlAdmin
 
 Write-Host ''
 Write-Host '  Hail está funcionando:' -ForegroundColor Green
-Write-Host "    Pantallas:       $UrlPortal"
+Write-Host "    Pantallas:       $UrlPortal  (entra con tu cuenta de administrador)"
 Write-Host "    Administración:  $UrlAdmin"
 Write-Host ''
 Write-Host '  Para apagarlo, cierra las ventanas "Hail - Backend", "Hail - Simulador de datos" y "Hail - Pantallas".'

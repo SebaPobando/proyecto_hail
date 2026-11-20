@@ -43,8 +43,10 @@ class TestProjectIsolation:
         assert detail["organization"]["slug"] == "cliente-a"
         assert detail["role"] == Membership.Role.OPERATOR
         assert detail["signal_count"] == 1
-        tags = [s["tag"] for s in client.get("/api/projects/planta-a/signals").json()]
-        assert tags == ["PLANTA-A-LT-101"]
+        signals = client.get("/api/projects/planta-a/signals").json()
+        assert [s["tag"] for s in signals] == ["PLANTA-A-LT-101"]
+        # Campos de la lista de E/S que usa la tabla de señales del frontend
+        assert {"module", "field_device", "logic", "address", "device"} <= signals[0].keys()
 
     def test_platform_admin_sees_every_project(self, client_for, platform_admin, project_a, project_b):
         client = client_for(platform_admin)
