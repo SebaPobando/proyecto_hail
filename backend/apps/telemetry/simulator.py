@@ -18,9 +18,27 @@ def _walk(value: float, low: float, high: float, step: float, rng: random.Random
     return min(high, max(low, value + rng.uniform(-step, step)))
 
 
+def _recover(value: float, low: float, high: float, step: float, rng: random.Random, rate: float) -> float:
+    """Vuelve gradualmente a la banda normal tras una falla y luego camina dentro de ella."""
+    if value < low:
+        return min(low, value + rate)
+    if value > high:
+        return max(high, value - rate)
+    return _walk(value, low, high, step, rng)
+
+
+FAULTS = ("pump", "dosing")
+
+
 @dataclass
 class AguaPozoSimulator:
-    """Mensaje test_v1 del gateway de AguaPozo (cbox-01)."""
+    """Mensaje test_v1 del gateway de AguaPozo (cbox-01).
+
+    De vez en cuando simula una falla, para que la demostración tenga alarmas:
+    - "pump": la bomba queda en falla, el caudal cae a 0 y el estanque baja.
+    - "dosing": la dosificación falla y el cloro residual cae bajo 0,2 mg/L.
+    Cada falla dura entre 15 y 30 muestras y luego el proceso se recupera solo.
+    """
 
     topic: str = "hail/aguapozo/aguapozo/cbox-01/telemetry"
     level: float = 68.0
@@ -28,13 +46,39 @@ class AguaPozoSimulator:
     flow: float = 12.4
     chlorine: float = 0.65
     rng: random.Random = field(default_factory=random.Random)
+    # Probabilidad de iniciar una falla en cada muestra: con muestras cada 10 s, ~1 falla cada 30 min.
+    fault_probability: float = 1 / 180
+    fault: str | None = None
+    fault_left: int = 0
+
+    def start_fault(self, kind: str, samples: int | None = None) -> None:
+        if kind not in FAULTS:
+            raise ValueError(f"Falla desconocida: {kind}")
+        self.fault = kind
+        self.fault_left = samples if samples is not None else self.rng.randint(15, 30)
 
     def next_payload(self, now: datetime) -> bytes:
         rng = self.rng
-        self.level = _walk(self.level, 65, 71, 0.3, rng)
+        if self.fault is None and self.fault_probability and rng.random() < self.fault_probability:
+            self.start_fault(rng.choice(FAULTS))
+        pump, dosing = "running", "active"
+        if self.fault == "pump":
+            pump = "fault"
+            self.flow = max(0.0, self.flow - 4.0)
+            self.level = max(0.0, self.level - 0.4)
+        else:
+            self.flow = _recover(self.flow, 11.8, 13.0, 0.1, rng, rate=3.0)
+            self.level = _recover(self.level, 65, 71, 0.3, rng, rate=0.4)
+        if self.fault == "dosing":
+            dosing = "fault"
+            self.chlorine = max(0.1, self.chlorine - 0.04)
+        else:
+            self.chlorine = _recover(self.chlorine, 0.625, 0.675, 0.004, rng, rate=0.03)
         self.well = _walk(self.well, 11, 13, 0.05, rng)
-        self.flow = _walk(self.flow, 11.8, 13.0, 0.1, rng)
-        self.chlorine = _walk(self.chlorine, 0.625, 0.675, 0.004, rng)
+        if self.fault is not None:
+            self.fault_left -= 1
+            if self.fault_left <= 0:
+                self.fault = None
         message = {
             "version": 1,
             "timestamp": now.isoformat(),
@@ -42,8 +86,8 @@ class AguaPozoSimulator:
             "wellWaterDepthM": round(self.well, 2),
             "flow": round(self.flow, 2),
             "chlorine": round(self.chlorine, 3),
-            "pump": "running",
-            "dosing": "active",
+            "pump": pump,
+            "dosing": dosing,
         }
         return json.dumps(message).encode()
 

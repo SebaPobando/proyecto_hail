@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { HailLogo } from '../design-system';
-import type { HmiType, Me, ProjectSummary } from '../services/hail';
+import { alarmTotals, priorityLabel } from '../services/alarms';
+import { getAlarmSummary, type AlarmSummary, type HmiType, type Me, type ProjectSummary } from '../services/hail';
+import { usePolling } from '../services/usePolling';
 import { useRouteValue } from '../services/navigation';
 import { projectStatusLabel, useProjectsDataStatus } from '../services/projectStatus';
 import OperationsCenter, { operationPages, type OperationPage } from './OperationsCenter';
+import './alarmsPanel.css';
 import './projectPortal.css';
 import './visualIdentity.css';
 
@@ -29,7 +32,9 @@ export function initials(me: Pick<Me, 'full_name' | 'email'>): string {
   return me.email.slice(0, 2).toUpperCase();
 }
 
-function PortalIcon({ hmi }: { hmi?: HmiType }) {
+const BELL = 'M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Zm4 4a2 2 0 0 0 4 0';
+
+function PortalIcon({ hmi, path }: { hmi?: HmiType; path?: string }) {
   const paths: Record<HmiType, string> = {
     aguapozo: 'M12 3C9 8 5 12 5 16a7 7 0 0 0 14 0c0-4-4-8-7-13Z',
     electrical: 'm13 2-8 12h6l-1 8 9-12h-6l1-8Z',
@@ -37,8 +42,18 @@ function PortalIcon({ hmi }: { hmi?: HmiType }) {
     generic: 'M4 5h16v14H4zM4 10h16M9 10v9',
   };
   return <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
-    <path d={hmi ? paths[hmi] : 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'}/>
+    <path d={path ?? (hmi ? paths[hmi] : 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z')}/>
   </svg>;
+}
+
+/** Aviso sobre cada HMI cuando el proyecto tiene alarmas abiertas. */
+function AlarmStrip({ summary, onOpen }: { summary?: AlarmSummary; onOpen: () => void }) {
+  if (!summary) return null;
+  return <div className={`alarm-strip alarm-strip--${summary.highest_priority}`} role="status">
+    <strong>{summary.open === 1 ? '1 alarma abierta' : `${summary.open} alarmas abiertas`}</strong>
+    <span>{summary.unacknowledged} sin reconocer · prioridad más alta: {priorityLabel[summary.highest_priority].toLowerCase()}</span>
+    <button className="ds-button ds-button--secondary ds-button--sm" type="button" onClick={onOpen}>Ver alarmas</button>
+  </div>;
 }
 
 function ProjectHmi({ project, back }: { project: ProjectSummary; back: ReactNode }) {
@@ -57,6 +72,9 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
   const [view, setView] = useRouteValue('view', 'portal', ['portal', 'standalone']);
   const project = projects.find(item => item.slug === route);
   const statuses = useProjectsDataStatus(projects, !project);
+  const alarmPoll = usePolling(getAlarmSummary, 10_000, `alarm-summary:${me.id}`, projects.length > 0);
+  const alarmSummary = alarmPoll.data ?? [];
+  const totals = alarmTotals(alarmSummary);
   const navigate = (slug: string | null) => setRoute(slug ?? '');
   const back = <button className="project-back" type="button" onClick={() => navigate(null)}>← Mis proyectos</button>;
   const standalone = view === 'standalone' && !!project;
@@ -65,6 +83,15 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
   useEffect(() => {
     document.title = project ? `${project.name} · Hail` : 'Hail · Supervisión industrial';
   }, [project]);
+
+  function openAlarms(slug: string) {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    params.delete('project');
+    params.delete('view');
+    params.set('section', 'Alarmas');
+    params.set('alarmProject', slug);
+    window.location.hash = params.toString();
+  }
 
   function detachedLink(slug: string) {
     const params = new URLSearchParams(window.location.hash.slice(1));
@@ -88,7 +115,8 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
         <div className="portal-brand"><HailLogo height={42} tagline="Centro de operaciones" /></div>
         <nav className="portal-menu" aria-label="Navegación de proyectos">
           {operationPages.map(page => <button key={page} type="button" aria-current={!project && operation === page ? 'page' : undefined} onClick={() => { setOperation(page); navigate(null); }}>
-            <PortalIcon/>{page === 'Resumen' ? 'Centro de operaciones' : page}
+            <PortalIcon path={page === 'Alarmas' ? BELL : undefined}/>{page === 'Resumen' ? 'Centro de operaciones' : page}
+            {page === 'Alarmas' && totals.unacknowledged > 0 && <span className="alarm-count" aria-label={`${totals.unacknowledged} sin reconocer`}>{totals.unacknowledged}</span>}
           </button>)}
           {projects.length > 0 && <p className="portal-menu-heading">Instalaciones</p>}
           {projects.map(item => <button key={item.slug} type="button" aria-current={project?.slug === item.slug ? 'page' : undefined} onClick={() => navigate(item.slug)}>
@@ -109,8 +137,9 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
               {!standalone && <a href={detachedLink(project.slug)} target="_blank" rel="noopener noreferrer">Abrir en otra pestaña ↗</a>}
             </div>
           </div>
+          <AlarmStrip summary={alarmSummary.find(row => row.project === project.slug)} onOpen={() => openAlarms(project.slug)}/>
           <Suspense fallback={<p role="status">Cargando pantalla…</p>}><ProjectHmi project={project} back={back}/></Suspense>
-        </> : <OperationsCenter key={me.id} page={operation as OperationPage} projects={projects} userId={String(me.id)} statuses={statuses} openProject={navigate} showPage={setOperation}/>}
+        </> : <OperationsCenter key={me.id} page={operation as OperationPage} projects={projects} statuses={statuses} alarms={alarmSummary} openProject={navigate} showPage={setOperation}/>}
         {!projects.length && <p className="ops-empty">Tu cuenta todavía no tiene proyectos asignados. Pide acceso al administrador.</p>}
       </main>
     </div>

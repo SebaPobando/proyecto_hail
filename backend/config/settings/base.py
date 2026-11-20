@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "apps.projects",
     "apps.audit",
     "apps.telemetry",
+    "apps.alarms",
+    "apps.operations",
 ]
 
 MIDDLEWARE = [

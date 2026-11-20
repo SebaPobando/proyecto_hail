@@ -10,6 +10,8 @@ from ninja import NinjaAPI
 from ninja.security import django_auth
 
 from apps.accounts.api import router as auth_router
+from apps.alarms.api import router as alarms_router
+from apps.operations.api import router as work_items_router
 from apps.projects.api import router as projects_router
 from apps.telemetry.api import router as telemetry_router
 
@@ -24,6 +26,8 @@ api = NinjaAPI(
 api.add_router("/auth", auth_router, tags=["auth"])
 api.add_router("/projects", projects_router, tags=["proyectos"])
 api.add_router("/projects", telemetry_router, tags=["telemetría"])
+api.add_router("/alarms", alarms_router, tags=["alarmas"])
+api.add_router("/work-items", work_items_router, tags=["bitácora"])
 
 
 @api.get("/health", auth=None, tags=["sistema"])

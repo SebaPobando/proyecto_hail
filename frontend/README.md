@@ -28,12 +28,14 @@ src/
 │   ├── aguapozo.ts         adaptador de AguaPozo (lectura actual e historial)
 │   ├── meters.ts           adaptador de medidores eléctricos y resúmenes
 │   ├── projectStatus.ts    estado de datos por proyecto
+│   ├── alarms.ts           etiquetas, tonos y permisos de alarmas y bitácora
 │   └── quality.ts          validación de la telemetría de AguaPozo
 ├── components/
 │   ├── Session.tsx         login, recuperación y nueva contraseña
 │   ├── ProjectPortal.tsx   menú, catálogo y pantalla según hmi_type
-│   ├── OperationsCenter.tsx resumen, inventario, bitácora local y conectividad
-│   ├── WaterHmi.tsx        AguaPozo: proceso, tendencias, alarmas (F4)
+│   ├── OperationsCenter.tsx resumen, alarmas, inventario, bitácora compartida y conectividad
+│   ├── AlarmsPanel.tsx     alarmas abiertas e historial, reconocer y crear seguimiento
+│   ├── WaterHmi.tsx        AguaPozo: proceso, tendencias y alarmas
 │   ├── ElectricalOverview.tsx, MeterDetail.tsx, MeterAnalysis.tsx   medidores
 │   ├── NutrialHmi.tsx      Nutrial: proceso (simulado), señales desde la API
 │   └── GenericHmi.tsx      tabla de lectura actual para proyectos sin HMI propia

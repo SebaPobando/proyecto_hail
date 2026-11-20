@@ -1,0 +1,42 @@
+/* Panel de alarmas. Prioridad = color de estado (ISA-101), nunca el naranjo de marca. */
+.alarms-panel { display: grid; gap: var(--space-3); }
+.alarms-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); color: var(--color-text-muted); font-size: var(--text-sm); }
+.alarms-switch { display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.alarms-switch button { border: 0; background: var(--color-surface); color: var(--color-text); padding: 6px 14px; font: inherit; cursor: pointer; }
+.alarms-switch button + button { border-left: 1px solid var(--color-border); }
+.alarms-switch button[aria-pressed='true'] { background: var(--color-primary); color: #fff; }
+.alarms-note { margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); }
+.alarms-empty { margin: 0; padding: var(--space-4); border: 1px dashed var(--color-border); border-radius: var(--radius-md); color: var(--color-text-muted); }
+.alarms-list { display: grid; gap: var(--space-3); }
+
+.alarm-row { display: grid; gap: var(--space-2); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-left: 4px solid var(--status-info); border-radius: var(--radius-md); background: var(--color-surface); }
+.alarm-row--high { border-left-color: var(--status-critical-indicator); }
+.alarm-row--medium { border-left-color: var(--status-warning-indicator); }
+.alarm-row.is-unacked { box-shadow: 0 0 0 1px var(--status-critical-bg), 0 2px 6px rgb(11 31 58 / 8%); }
+.alarm-row.is-unacked.alarm-row--high { background: linear-gradient(90deg, var(--status-critical-bg), var(--color-surface) 40%); }
+.alarm-row header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.alarm-row h3 { margin: 0; font-size: 15px; color: var(--color-heading); }
+.alarm-tag { font-family: var(--font-mono); font-weight: 700; margin-right: 4px; }
+.alarm-message { margin: 0; color: var(--color-text); }
+.alarm-state { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-muted); }
+.alarm-state--active_unack, .alarm-state--cleared_unack { color: var(--status-critical); }
+.alarm-project { margin-left: auto; font-size: var(--text-sm); color: var(--color-text-muted); }
+.alarm-row dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-2) var(--space-4); margin: 0; }
+.alarm-row dt { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--color-text-subtle); }
+.alarm-row dd { margin: 2px 0 0; font-variant-numeric: tabular-nums; }
+.alarm-ack { margin: 0; font-size: var(--text-sm); color: var(--color-text-muted); }
+.alarm-actions, .alarm-ack-form div { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.alarm-ack-form { display: grid; gap: var(--space-2); }
+.alarm-ack-form label { display: grid; gap: 4px; font-size: var(--text-sm); }
+.alarm-ack-form textarea { min-height: 56px; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font: inherit; }
+.alarm-notice { margin: 0; color: var(--status-ok); font-size: var(--text-sm); }
+.alarm-row [role='alert'] { margin: 0; color: var(--status-critical); font-size: var(--text-sm); }
+
+/* Aviso de alarmas abiertas sobre cada HMI */
+.alarm-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-surface); }
+.alarm-strip--high { border-color: var(--status-critical-indicator); background: var(--status-critical-bg); }
+.alarm-strip--medium { border-color: var(--status-warning-indicator); background: var(--status-warning-bg); }
+.alarm-strip strong { color: var(--color-heading); }
+.alarm-strip button { margin-left: auto; }
+.portal-menu .alarm-count { margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--status-critical-indicator); color: #fff; font-size: var(--text-xs); font-weight: 700; text-align: center; }
+.water-alarms { padding: var(--space-4) 0; }

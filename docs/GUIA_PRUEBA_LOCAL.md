@@ -87,6 +87,19 @@ Entra con tu cuenta de administrador: ves los tres proyectos. Recorre cada uno:
 - **Nutrial**: el esquema del proceso todavía es una simulación del navegador (su PLC no está conectado). En **Equipos y señales** está la lista de E/S real, que viene de la base de datos.
 - **Conectividad** (menú izquierdo): qué equipos están enviando datos y cuándo llegó lo último.
 
+### Alarmas
+
+Al abrir Hail con `iniciar.cmd`, el simulador provoca una **falla de la dosificación de cloro** en AguaPozo. En uno o dos minutos aparecen dos alarmas: "Falla en la dosificación" y "Cloro residual bajo 0,2 mg/L". Después, cada media hora más o menos, el simulador provoca otra falla al azar (de bomba o de dosificación) y el proceso se recupera solo a los pocos minutos.
+
+- En el menú izquierdo, **Alarmas** muestra las abiertas, con un contador rojo de las que nadie ha reconocido.
+- **Reconocer** deja constancia de quién vio la alarma y se hace cargo; se puede agregar un comentario. Una alarma queda abierta hasta que se reconoce, aunque el proceso ya se haya normalizado.
+- **Crear seguimiento** abre una tarea en la bitácora (menú **Seguimiento**), donde el equipo anota lo que se hizo.
+- **Historial** muestra todas las alarmas, también las cerradas.
+
+Prueba los roles: `cliente-aguapozo@hail.local` es **operador** y puede reconocer; `cliente-ulagos@hail.local` y `cliente-nutrial@hail.local` son **lectores**: ven, pero no reconocen ni escriben.
+
+> Por ahora los avisos son **solo en pantalla**: Hail no envía correos ni mensajes.
+
 **Prueba el aislamiento entre clientes.** Cierra sesión (arriba a la derecha) y entra como un cliente, por ejemplo `cliente-aguapozo@hail.local` con la contraseña `hail-demo-2026`. Ese usuario solo ve AguaPozo: los otros proyectos no aparecen ni escribiendo su dirección. Los otros clientes de prueba son `cliente-ulagos@hail.local` y `cliente-nutrial@hail.local` (misma contraseña).
 
 ### La administración — botón "Administración" arriba a la derecha (o http://127.0.0.1:5173/admin/)
@@ -99,6 +112,8 @@ Usa la misma sesión de las pantallas: si ya entraste como administrador, no vue
 | **Proyectos** | AguaPozo, Medidores ULagos y Nutrial. |
 | **Dispositivos** | Los equipos de campo de cada proyecto (PLC, medidores, gateway), con su modelo y su usuario MQTT. |
 | **Señales** | Cada variable que mide un equipo: tag, nombre, unidad, rango, si es analógica o digital. **Aquí es donde más sirve tu revisión.** |
+| **Reglas de alarma** | Cuándo se activa cada alarma: señal, condición (alto, bajo o estado), umbral, banda muerta, prioridad y mensaje. Puedes crear, cambiar o deshabilitar reglas, y se aplican con la siguiente lectura. |
+| **Alarmas** y **Seguimientos** | El registro completo de alarmas y la bitácora, de solo consulta. |
 | **Lecturas actuales** | El último valor de cada señal. Con el simulador corriendo, si recargas la página (F5) cada 10 segundos ves cómo cambian. |
 | **Estado de los workers** | Si el servicio que recibe datos por MQTT está vivo (en esta prueba no se usa). |
 
@@ -107,6 +122,7 @@ Usa la misma sesión de las pantallas: si ya entraste como administrador, no vue
 Lo más útil es revisar con ojo de electrónico lo que es de terreno:
 
 - **Señales** de cada equipo: ¿los tags, unidades y rangos tienen sentido? ¿Falta alguna señal importante? ¿Algún estado digital está mal nombrado?
+- **Reglas de alarma**: las de demostración usan la NCh409 para el cloro (0,2 a 2,0 mg/L) y la IEEE 519 para el THD (8 %). ¿Qué umbrales, bandas muertas y prioridades corresponden en cada instalación real? ¿Faltan alarmas importantes?
 - **[Protocolo MQTT](PROTOCOLO_MQTT.md)**: cómo tiene que enviar los datos un equipo de campo, y qué falta saber de la CBOX Haiwell para conectarla.
 
 Anota lo que veas (una captura con una nota sirve) y se lo mandas a Seba.

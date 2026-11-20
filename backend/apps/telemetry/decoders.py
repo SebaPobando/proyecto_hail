@@ -84,7 +84,7 @@ def decode_hail_v1(payload: bytes) -> Sample:
     return sample
 
 
-# Mensaje de prueba del prototipo (server/publish.ts). Siempre calidad simulada:
+# Mensaje de prueba heredado del prototipo (lo usa el simulador). Siempre calidad simulada:
 # nunca debe aparentar una conexión real.
 TEST_V1_MEASUREMENTS = {"level": "LT-101", "wellWaterDepthM": "LT-102", "flow": "FT-101", "chlorine": "AIT-101"}
 TEST_V1_STATES = {

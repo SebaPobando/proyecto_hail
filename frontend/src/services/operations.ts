@@ -1,9 +1,7 @@
 /**
- * Inventario de referencia y bitácora local del centro de operaciones.
- *
- * El inventario es la lista de equipos de ingeniería de cada instalación (no
- * los dispositivos que envían datos, que vienen de la API). La bitácora se
- * guarda en el navegador hasta que exista en el backend.
+ * Inventario de referencia del centro de operaciones: la lista de equipos de
+ * ingeniería de cada instalación (no los dispositivos que envían datos, que
+ * vienen de la API). La bitácora vive en el backend (/api/work-items).
  */
 export type Asset = { id: string; project: string; name: string; category: string; source: string };
 
@@ -26,35 +24,10 @@ export const assets: Asset[] = [
   ].map(([id, name]) => ({ id, name, category: 'Proceso', project: 'nutrial', source: 'Referencia de ingeniería Nutrial' })),
 ];
 
-export type WorkItem = {
-  id: string; project: string; asset: string; title: string;
-  priority: 'Normal' | 'Alta'; status: 'Pendiente' | 'En atención' | 'Resuelto';
-  owner: string; due: string; created: string; events: { at: string; text: string }[];
-};
-
 const normalize = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export function searchAssets(allowed: readonly string[], project: string, search: string) {
   return assets.filter(asset => allowed.includes(asset.project)
     && (project === 'all' || asset.project === project)
     && normalize(`${asset.id} ${asset.name} ${asset.category}`).includes(normalize(search)));
-}
-
-export function validWorkItem(value: unknown): value is WorkItem {
-  if (!value || typeof value !== 'object') return false;
-  const item = value as WorkItem;
-  return typeof item.id === 'string' && typeof item.project === 'string' && typeof item.asset === 'string'
-    && typeof item.title === 'string' && ['Normal', 'Alta'].includes(item.priority)
-    && ['Pendiente', 'En atención', 'Resuelto'].includes(item.status)
-    && typeof item.owner === 'string' && typeof item.due === 'string' && typeof item.created === 'string'
-    && Array.isArray(item.events) && item.events.every(event => typeof event.at === 'string' && typeof event.text === 'string');
-}
-
-export function readWorkItems(key: string): WorkItem[] {
-  try {
-    const raw = JSON.parse(localStorage.getItem(key) || '[]');
-    return Array.isArray(raw) ? raw.filter(validWorkItem) : [];
-  } catch {
-    return [];
-  }
 }

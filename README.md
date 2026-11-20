@@ -81,9 +81,9 @@ Cada lectura lleva su **calidad** (válida, dudosa, mala, simulada) y su **fecha
 
 - **Proceso**: diagrama de la instalación con los equipos dibujados y los valores en vivo sobre cada instrumento.
 - **Tendencias**: gráficos históricos por variable (1 h, 8 h, 24 h, 7 días) con exportación a CSV.
-- **Alarmas**: alarmas activas, historial de eventos y filtros por prioridad y fecha.
+- **Alarmas**: alarmas abiertas e historial, evaluadas por Hail con reglas por señal (umbral, banda muerta, prioridad). Un operador las reconoce con un comentario y puede abrir un seguimiento desde la alarma.
 - **Medidores**: resumen general y detalle por medidor, incluido análisis de armónicos.
-- **Centro de operaciones**: resumen de todas las instalaciones del usuario, inventario de equipos, bitácora de revisiones e intervenciones, y estado de conectividad de cada tramo de la cadena.
+- **Centro de operaciones**: resumen de todas las instalaciones del usuario, alarmas, inventario de equipos, bitácora compartida de revisiones e intervenciones, y estado de conectividad de cada tramo de la cadena.
 
 ---
 
@@ -93,7 +93,7 @@ La plataforma está construida, pero hay decisiones que **no deben tomarse desde
 
 | Tema | Qué se necesita |
 | --- | --- |
-| **Límites de alarma** | Definir umbrales, histéresis y tiempos de persistencia por variable. Hoy no hay ningún límite aprobado y la plataforma no activa alarmas reales sin esa aprobación. |
+| **Límites de alarma** | Hail ya evalúa reglas por señal (umbral, banda muerta, prioridad), configurables en la administración. Las de demostración usan como referencia NCh409 (cloro residual 0,2 a 2,0 mg/L) e IEEE 519 (THD de voltaje ≤ 8 % en baja tensión). Para una instalación real, cada límite lo define y aprueba ingeniería. |
 | **Mapa de variables** | Validar tags, escalas, unidades y rangos físicos de cada señal contra los planos y la lista de E/S. |
 | **Calibración** | Cotas de instalación de sondas (ej. LT-102), factores de escala de transformadores de corriente y potencial. |
 | **Calidad de energía** | Interpretar THD, factor de potencia y desbalance; definir qué reportar a cada cliente. |
@@ -114,7 +114,8 @@ La plataforma ya dejó atrás el prototipo (Node + Firebase): hoy todo corre sob
 | F1 · Plataforma multicliente | Clientes, usuarios, permisos, proyectos, equipos y señales administrables; registro de auditoría | **Listo** |
 | F2 · Recepción de datos | Broker MQTT, validación, base de datos de series de tiempo, historial | **Listo** (falta definir cuánto tiempo se guardan los datos crudos) |
 | F3 · Pantallas conectadas | Las HMI leen desde la nueva plataforma; inicio de sesión propio; cada cliente ve solo lo suyo | **Listo** |
-| F4 · Operación | Alarmas configurables, avisos por correo o mensajería, bitácora compartida | Pendiente |
+| F4a · Alarmas y bitácora | Reglas de alarma por señal, reconocimiento con autor, bitácora compartida; avisos solo en pantalla | **Listo** |
+| F4b · Tiempo real y avisos | Pantallas en vivo por WebSocket; avisos por correo o mensajería | Pendiente |
 | F5 · Producción | Servidor, cifrado, respaldos, monitoreo; piloto con AguaPozo en datos reales | Pendiente |
 | F6 · Cierre de migración | Retiro del prototipo y de Firebase | **Listo** (se adelantó a F3: Firebase no tenía usuarios reales) |
 
@@ -142,7 +143,7 @@ Esta sección es para quien desarrolla o despliega la plataforma.
 | API y administración | Python · Django 5.2 + Django Ninja |
 | Base de datos | PostgreSQL + TimescaleDB (series de tiempo) |
 | Mensajería con equipos | MQTT (Mosquitto en desarrollo) |
-| Tiempo real y tareas (F4) | Redis, Django Channels, Celery |
+| Tiempo real y tareas (F4b) | Redis, Django Channels, Celery |
 | Despliegue (F5) | Docker Compose + Caddy (HTTPS) |
 
 Los motivos de cada decisión están en [docs/adr/](docs/adr/).
@@ -236,7 +237,7 @@ Abre otra terminal en la carpeta del proyecto:
 ```powershell
 cd backend
 .\.venv\Scripts\Activate.ps1
-python manage.py simulate_telemetry --direct   # escribe lecturas simuladas cada 10 s
+python manage.py simulate_telemetry --direct --fault dosing   # lecturas simuladas cada 10 s; parte con una falla para ver alarmas
 ```
 
 ### Paso 5 · Pantallas (terminal 3)
@@ -256,7 +257,9 @@ npm.cmd run dev
 | http://127.0.0.1:5173/admin/telemetry/latestreading/ | Lecturas que va dejando el simulador, actualizadas cada 10 s |
 | http://127.0.0.1:8000/api/docs | La API con documentación interactiva |
 
-Usuarios de cliente para probar el aislamiento entre proyectos: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local`, todos con contraseña `hail-demo-2026` (solo en desarrollo). Cada uno ve únicamente su proyecto.
+Usuarios de cliente para probar el aislamiento entre proyectos: `cliente-aguapozo@hail.local`, `cliente-ulagos@hail.local`, `cliente-nutrial@hail.local`, todos con contraseña `hail-demo-2026` (solo en desarrollo). Cada uno ve únicamente su proyecto. `cliente-aguapozo` es operador (puede reconocer alarmas y escribir en la bitácora); los otros dos son lectores.
+
+El simulador provoca fallas de AguaPozo al azar (bomba o dosificación, más o menos una cada 30 minutos) para que haya alarmas que ver; `--fault pump` o `--fault dosing` fuerza una al partir y `--no-faults` las desactiva.
 
 En desarrollo, Vite reenvía `/api`, `/admin` y `/static` al backend (`frontend/vite.config.ts`): el navegador ve un solo sitio y una misma sesión sirve para las pantallas y la administración.
 
@@ -334,6 +337,6 @@ Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para corr
 - [Roadmap](docs/ROADMAP.md): fases, entregables y fechas estimadas.
 - [Arquitectura](docs/ARQUITECTURA.md): componentes, modelo de datos, API y convenciones del código.
 - [Protocolo MQTT](docs/PROTOCOLO_MQTT.md): cómo debe publicar un equipo de campo; qué falta de la CBOX.
-- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system, sesión y mismo origen.
+- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system, sesión y mismo origen, alarmas.
 - [Design system](frontend/src/design-system/README.md): reglas de color, tipografía, estados y componentes.
 - [Operación del prototipo](docs/legacy/OPERACION.md): documento histórico; sirve como lista de verificaciones para la fase F5.

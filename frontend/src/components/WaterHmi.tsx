@@ -6,7 +6,7 @@ import { useRouteValue } from '../services/navigation';
 import { isUsable, telemetryStatus } from '../services/quality';
 import { usePolling } from '../services/usePolling';
 import { pumpStatus } from './equipmentStatus';
-import FieldAlarmsPending from './FieldAlarmsPending';
+import AlarmsPanel from './AlarmsPanel';
 import HmiNavigation from './HmiNavigation';
 import ProcessDiagram from './ProcessDiagram';
 import ProcessVariables from './ProcessVariables';
@@ -90,7 +90,7 @@ export default function WaterHmi({ project, back }: { project: ProjectSummary; b
         </aside>
       </main> : screen === 'trends'
         ? <Suspense fallback={<main className="trends-screen" aria-label="Tendencias"><p role="status">Cargando pantalla…</p></main>}><TrendsScreen data={data} historyService={history}/></Suspense>
-        : <main className="alarms-screen" aria-label="Alarmas"><FieldAlarmsPending/></main>}
+        : <main className="water-alarms" aria-label="Alarmas"><AlarmsPanel projects={[project]} project={project.slug}/></main>}
     </div>
   </div>;
 }

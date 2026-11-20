@@ -72,7 +72,7 @@ if (Responde $UrlSalud) {
     if ($codigo -ne 0) { Falla 'no se pudo preparar la base de datos.' }
 
     Abrir-Ventana 'Backend' $Backend "& '.\.venv\Scripts\python.exe' manage.py runserver 127.0.0.1:8000"
-    Abrir-Ventana 'Simulador de datos' $Backend "& '.\.venv\Scripts\python.exe' manage.py simulate_telemetry --direct"
+    Abrir-Ventana 'Simulador de datos' $Backend "& '.\.venv\Scripts\python.exe' manage.py simulate_telemetry --direct --fault dosing"
     Abrir-Ventana 'Pantallas' $Frontend 'npm.cmd run dev'
 
     if (-not (Esperar $UrlSalud 'al backend')) { Falla 'el backend no partió. Mira la ventana "Hail - Backend".' }

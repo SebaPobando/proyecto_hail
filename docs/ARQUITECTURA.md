@@ -9,7 +9,7 @@
 | Base de datos | PostgreSQL + TimescaleDB | F1 (relacional), F2 (hypertable de lecturas) |
 | Broker MQTT | Mosquitto en desarrollo; producción por decidir (EMQX o Mosquitto) | F2 |
 | Ingesta | Worker Python `manage.py ingest_mqtt` (paho-mqtt) | F2 (listo) |
-| Tiempo real y tareas | Redis + Django Channels + Celery | F4 |
+| Tiempo real y tareas | Redis + Django Channels + Celery | F4b |
 | Proxy y TLS | Caddy | F5 |
 
 Cadena de datos: PLC → gateway (Haiwell CBOX) → broker MQTT → worker de ingesta → TimescaleDB → API → navegador.
@@ -94,6 +94,18 @@ Las contraseñas se guardan en el formato `$7$` de Mosquitto (PBKDF2-SHA512); nu
 
 Pendiente: plazo de retención y compresión del dato crudo (decisión de ingeniería con cada cliente).
 
+## Alarmas y bitácora (F4a)
+
+Ver [ADR 0006](adr/0006-alarmas.md).
+
+- **Reglas** (`apps/alarms`, `AlarmRule`): por señal, condición alto (≥), bajo (≤) o estado (=), umbral, banda muerta, prioridad (alta, media, baja) y mensaje para el operador. Se configuran en la administración.
+- **Evaluación**: dentro de `ingest()`, en la misma transacción, solo con lecturas que pasaron a ser la lectura actual. Las de calidad mala o dudosa no activan ni normalizan. Una restricción de base de datos garantiza una sola alarma activa por regla.
+- **Ciclo de vida (ISA-18.2)**: activa sin reconocer → reconocida → normalizada (cerrada); o normalizada sin reconocer → reconocida (cerrada). Una alarma queda "abierta" mientras esté activa o falte reconocerla. Las alarmas no se editan ni se borran; deshabilitar una regla normaliza sus alarmas activas.
+- **Permisos** (`apps/projects/permissions.py`): todos los que ven el proyecto ven sus alarmas y su bitácora; reconocer y escribir exige rol de operador, administrador del cliente o de plataforma. Cada reconocimiento queda en la auditoría.
+- **Bitácora** (`apps/operations`): seguimientos por proyecto con estado, prioridad, responsable, fecha objetivo y eventos con autor. Puede nacer de una alarma.
+- **API**: `GET /api/alarms`, `GET /api/alarms/summary`, `POST /api/alarms/{id}/acknowledge`, `GET|POST /api/work-items`, `PATCH /api/work-items/{id}`, `POST /api/work-items/{id}/notes`.
+- **Pendiente (F4b)**: avisos por correo o mensajería, tiempo de persistencia (on-delay), alarma por pérdida de comunicación y actualización en vivo por WebSocket. Hoy las pantallas consultan cada 5 a 10 segundos.
+
 ## Frontend
 
 `frontend/` es una SPA de React que solo habla con la API de Hail. Firebase, el servidor Node del prototipo y el despliegue en Vercel se retiraron en F3.
@@ -117,7 +129,7 @@ Pendiente: plazo de retención y compresión del dato crudo (decisión de ingeni
 - Una lectura vencida (`stale`) nunca se muestra como valor actual: aparece "—" o la etiqueta "Datos antiguos".
 - Un intervalo de historial sin datos es un hueco en el gráfico, no un cero.
 - Lo simulado siempre se rotula como simulado.
-- Las alarmas de campo dicen explícitamente que llegan en F4; una tabla vacía no significa "sin alarmas".
+- Las pantallas de alarmas dicen que los avisos son solo en pantalla y que una instalación sin reglas no genera alarmas: una lista vacía no certifica que todo esté bien.
 
 **Pruebas.** `npm test` corre Vitest sobre los adaptadores, el cliente de la API, el cálculo de estados y el render de las pantallas principales.
 

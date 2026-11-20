@@ -1,7 +1,8 @@
 """Carga los tres proyectos actuales de Hail como datos.
 
 Idempotente: puede ejecutarse varias veces; actualiza en vez de duplicar.
-Con --demo-users (solo con DEBUG=True) crea un usuario lector por cliente.
+Con --demo-users (solo con DEBUG=True) crea un usuario por cliente: el de
+AguaPozo es operador (puede reconocer alarmas) y los demás son lectores.
 
     python manage.py seed_demo
     python manage.py seed_demo --demo-users
@@ -15,6 +16,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.accounts.models import User
+from apps.alarms.models import AlarmRule, Priority
 from apps.projects.models import Device, Project, Signal
 from apps.tenancy.models import Membership, Organization
 
@@ -96,6 +98,45 @@ METER_VARIABLES = [
 ]
 
 
+# Reglas de alarma de demostración: (tag, condición, umbral, banda muerta, prioridad, mensaje).
+# Cloro: NCh409/1 exige entre 0,2 y 2,0 mg/L de cloro libre residual. THD: IEEE 519, baja tensión.
+AGUAPOZO_RULES = [
+    ("LT-101", "low", 20, 2, Priority.HIGH, "Nivel bajo del estanque: revisar la bomba P-101 y el consumo."),
+    (
+        "LT-101",
+        "high",
+        95,
+        2,
+        Priority.MEDIUM,
+        "Nivel alto del estanque: riesgo de rebalse, revisar el control de nivel.",
+    ),
+    (
+        "AIT-101",
+        "low",
+        0.2,
+        0.05,
+        Priority.HIGH,
+        "Cloro residual bajo 0,2 mg/L (NCh409): revisar la dosificación D-101.",
+    ),
+    (
+        "AIT-101",
+        "high",
+        2.0,
+        0.1,
+        Priority.MEDIUM,
+        "Cloro residual sobre 2,0 mg/L (NCh409): revisar el ajuste de la dosificadora.",
+    ),
+    ("P-101", "state", 2, 0, Priority.HIGH, "Falla de la bomba sumergible: verificar protecciones en el tablero."),
+    ("D-101", "state", 2, 0, Priority.MEDIUM, "Falla en la dosificación de cloro: el agua sale sin desinfección."),
+]
+METER_RULES = [
+    ("F", "low", 49.5, 0.05, Priority.MEDIUM, "Frecuencia bajo 49,5 Hz."),
+    ("F", "high", 50.5, 0.05, Priority.MEDIUM, "Frecuencia sobre 50,5 Hz."),
+    ("THDV", "high", 8, 0.5, Priority.LOW, "THD de voltaje sobre 8 % (IEEE 519, baja tensión)."),
+]
+DEMO_OPERATORS = {"aguapozo"}
+
+
 class Command(BaseCommand):
     help = "Carga AguaPozo, Medidores Eléctricos y Nutrial como organizaciones, proyectos, dispositivos y señales."
 
@@ -119,6 +160,7 @@ class Command(BaseCommand):
         self._seed_aguapozo(projects["aguapozo"])
         self._seed_meters(projects["medidores-electricos"])
         self._seed_nutrial(projects["nutrial"])
+        rules = self._seed_alarm_rules(projects)
 
         if options["demo_users"]:
             if not settings.DEBUG:
@@ -128,11 +170,14 @@ class Command(BaseCommand):
                 if created:
                     user.set_password(DEMO_PASSWORD)
                     user.save()
-                Membership.objects.get_or_create(user=user, organization=org)
-            self.stdout.write(f"Usuarios demo: cliente-<org>@hail.local / {DEMO_PASSWORD}")
+                role = Membership.Role.OPERATOR if slug in DEMO_OPERATORS else Membership.Role.VIEWER
+                Membership.objects.update_or_create(user=user, organization=org, defaults={"role": role})
+            self.stdout.write(
+                f"Usuarios demo: cliente-<org>@hail.local / {DEMO_PASSWORD} (cliente-aguapozo es operador)"
+            )
 
         total = Signal.objects.filter(project__in=projects.values()).count()
-        summary = f"Listo: {len(orgs)} clientes, {len(projects)} proyectos, {total} señales."
+        summary = f"Listo: {len(orgs)} clientes, {len(projects)} proyectos, {total} señales, {rules} reglas de alarma."
         self.stdout.write(self.style.SUCCESS(summary))
 
     def _seed_aguapozo(self, project):
@@ -214,3 +259,16 @@ class Command(BaseCommand):
                     "decimals": 2 if row["type"] in ("AI", "AO") else 0,
                 },
             )
+
+    def _seed_alarm_rules(self, projects) -> int:
+        specs = [(projects["aguapozo"], *rule) for rule in AGUAPOZO_RULES]
+        for code, _, _ in METERS:
+            specs += [(projects["medidores-electricos"], f"{code}-{suffix}", *rest) for suffix, *rest in METER_RULES]
+        for project, tag, condition, threshold, deadband, priority, message in specs:
+            signal = Signal.objects.get(project=project, tag=tag)
+            AlarmRule.objects.update_or_create(
+                signal=signal,
+                condition=condition,
+                defaults={"threshold": threshold, "deadband": deadband, "priority": priority, "message": message},
+            )
+        return len(specs)

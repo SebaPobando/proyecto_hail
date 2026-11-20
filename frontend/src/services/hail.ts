@@ -158,3 +158,86 @@ export const getHistory = (
 
 export const HISTORY_MAX_DAYS = 31;
 export const HISTORY_MAX_POINTS = 2000;
+
+// ------------------------------------------------------------------ alarmas
+
+export type AlarmPriority = 'high' | 'medium' | 'low';
+/** Ciclo ISA-18.2: activa sin reconocer → reconocida → normalizada; o normalizada sin reconocer → cerrada. */
+export type AlarmState = 'active_unack' | 'active_ack' | 'cleared_unack' | 'closed';
+
+export interface Alarm {
+  id: number;
+  project: string;
+  project_name: string;
+  tag: string;
+  description: string;
+  unit: string;
+  /** Texto de la regla, por ejemplo "≤ 0,2 mg/L" o "= Falla". */
+  condition: string;
+  priority: AlarmPriority;
+  message: string;
+  state: AlarmState;
+  raised_at: string;
+  raise_value: number;
+  cleared_at: string | null;
+  clear_value: number | null;
+  acknowledged_at: string | null;
+  acknowledged_by: string | null;
+  ack_comment: string;
+  simulated: boolean;
+}
+
+export interface AlarmSummary {
+  project: string;
+  active: number;
+  unacknowledged: number;
+  open: number;
+  highest_priority: AlarmPriority;
+}
+
+export const listAlarms = ({ project, status = 'open', signal }: { project?: string; status?: 'open' | 'all'; signal?: AbortSignal } = {}) =>
+  request<Alarm[]>('/alarms', { query: { project, status }, signal });
+export const getAlarmSummary = (signal?: AbortSignal) => request<AlarmSummary[]>('/alarms/summary', { signal });
+export const acknowledgeAlarm = (id: number, comment: string) =>
+  request<Alarm>(`/alarms/${id}/acknowledge`, { method: 'POST', body: { comment } });
+
+// ------------------------------------------------------------------ bitácora compartida
+
+export type WorkStatus = 'pending' | 'in_progress' | 'resolved';
+export type WorkPriority = 'normal' | 'high';
+
+export interface WorkItemEvent { kind: 'created' | 'change' | 'note'; text: string; author: string | null; created_at: string }
+
+export interface WorkItem {
+  id: number;
+  project: string;
+  asset: string;
+  title: string;
+  priority: WorkPriority;
+  status: WorkStatus;
+  owner: string;
+  due_date: string | null;
+  alarm_id: number | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  events: WorkItemEvent[];
+}
+
+export interface NewWorkItem {
+  project: string;
+  title: string;
+  asset?: string;
+  priority?: WorkPriority;
+  owner?: string;
+  due_date?: string | null;
+  alarm_id?: number | null;
+}
+
+export const listWorkItems = ({ project, status = 'all', signal }: { project?: string; status?: 'open' | 'all'; signal?: AbortSignal } = {}) =>
+  request<WorkItem[]>('/work-items', { query: { project, status }, signal });
+export const createWorkItem = (item: NewWorkItem) => request<WorkItem>('/work-items', { method: 'POST', body: item });
+export const updateWorkItem = (id: number, changes: Partial<Pick<WorkItem, 'status' | 'priority' | 'owner' | 'due_date'>>) =>
+  request<WorkItem>(`/work-items/${id}`, { method: 'PATCH', body: changes });
+export const addWorkItemNote = (id: number, text: string) =>
+  request<WorkItem>(`/work-items/${id}/notes`, { method: 'POST', body: { text } });
