@@ -4,6 +4,7 @@
 
 Proceso de larga duración. Se reconecta solo si el broker se cae y deja su
 pulso en WorkerStatus cada HEARTBEAT_SECONDS para la pantalla Conectividad.
+Con cada pulso revisa también las alarmas de pérdida de comunicación.
 """
 
 import logging
@@ -15,6 +16,7 @@ from django.core.management.base import BaseCommand
 from django.db import DatabaseError, close_old_connections
 from django.utils import timezone
 
+from apps.alarms.services import check_communication_and_notify
 from apps.telemetry.models import WorkerStatus
 from apps.telemetry.mqtt import TELEMETRY_SUBSCRIPTION, build_client
 from apps.telemetry.services import IngestError, ingest
@@ -59,11 +61,16 @@ class Counters:
             self.last_message_at = timezone.now()
 
 
-def write_heartbeat(started_at, counters: Counters) -> bool:
-    """Guarda el pulso. Si la base no responde, avisa y devuelve False: el worker sigue vivo y reintenta."""
+def write_heartbeat(started_at, counters: Counters, check_alarms: bool = True) -> bool:
+    """Guarda el pulso y revisa la comunicación de los dispositivos.
+
+    Si la base no responde, avisa y devuelve False: el worker sigue vivo y reintenta.
+    """
     try:
         close_old_connections()
         _save_heartbeat(started_at, counters)
+        if check_alarms:
+            check_communication_and_notify()
     except DatabaseError as error:
         logger.error("No se pudo escribir el pulso en la base de datos: %s", str(error).splitlines()[0])
         return False
@@ -123,4 +130,4 @@ class Command(BaseCommand):
         finally:
             client.loop_stop()
             counters.connected = False
-            write_heartbeat(started_at, counters)
+            write_heartbeat(started_at, counters, check_alarms=False)

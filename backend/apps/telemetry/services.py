@@ -10,7 +10,9 @@ simulador y las pruebas la llaman igual. Reglas:
   Un valor inválido se descarta sin perder los demás del mismo mensaje.
 - Los duplicados (misma señal y mismo instante) se ignoran.
 - La lectura actual nunca retrocede: un mensaje atrasado solo completa el historial.
-- Las lecturas que pasan a ser actuales se evalúan contra las reglas de alarma.
+- Las lecturas que pasan a ser actuales se evalúan contra las reglas de alarma, y la
+  llegada de datos normaliza la alarma de comunicación del dispositivo.
+- Al confirmar, se avisa a las pantallas conectadas (telemetría y, si cambiaron, alarmas).
 """
 
 import logging
@@ -20,8 +22,10 @@ from datetime import timedelta
 from django.db import transaction
 from django.utils import timezone
 
+from apps.alarms.evaluation import clear_communication
 from apps.alarms.evaluation import evaluate as evaluate_alarms
 from apps.projects.models import Device
+from apps.realtime.events import notify_on_commit
 
 from .decoders import DECODERS, DecodeError
 from .models import LatestReading, Reading
@@ -43,6 +47,7 @@ class IngestResult:
     accepted: int = 0
     rejected: dict[str, str] = field(default_factory=dict)  # tag -> motivo
     alarms_raised: int = 0
+    alarms_cleared: int = 0
 
 
 def parse_topic(topic: str) -> tuple[str, str, str]:
@@ -110,7 +115,12 @@ def ingest(topic: str, payload: bytes, *, now=None) -> IngestResult:
             if advanced:
                 current.append(reading)
         Device.objects.filter(pk=device.pk).update(last_seen_at=now)
-        result.alarms_raised = len(evaluate_alarms(current))
+        evaluation = evaluate_alarms(current)
+        communication = clear_communication(device, now)
+        result.alarms_raised = len(evaluation.raised)
+        result.alarms_cleared = evaluation.cleared + communication.cleared
+        kinds = ["telemetry", "alarms"] if evaluation.changed or communication.changed else ["telemetry"]
+        notify_on_commit(device.project.slug, *kinds)
 
     result.accepted = len(readings)
     if result.rejected:

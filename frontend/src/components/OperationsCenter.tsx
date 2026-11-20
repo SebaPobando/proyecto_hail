@@ -41,6 +41,7 @@ function ConnectivityPage({ projects }: { projects: ProjectSummary[] }) {
     15_000,
     `connectivity:${slugs.join('|')}`,
     slugs.length > 0,
+    { kinds: ['telemetry', 'alarms'] },
   );
   const results = poll.data;
   const worker = results?.[0]?.worker ?? null;
@@ -80,7 +81,7 @@ type WorkFilters = { project: string; search: string; status: string };
 function WorkLog({ projects, filters, draft, setDraft }: {
   projects: ProjectSummary[]; filters: WorkFilters; draft: boolean; setDraft: (open: boolean) => void;
 }) {
-  const poll = usePolling(signal => listWorkItems({ signal }), 15_000, 'work-items');
+  const poll = usePolling(signal => listWorkItems({ signal }), 15_000, 'work-items', true, { kinds: ['work_items'] });
   const operable = projects.filter(canOperate);
   const names = Object.fromEntries(projects.map(project => [project.slug, project.name]));
   const bySlug = new Map(projects.map(project => [project.slug, project]));

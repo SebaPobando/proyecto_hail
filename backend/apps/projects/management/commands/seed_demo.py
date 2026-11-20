@@ -98,41 +98,42 @@ METER_VARIABLES = [
 ]
 
 
-# Reglas de alarma de demostración: (tag, condición, umbral, banda muerta, prioridad, mensaje).
+# Reglas de alarma de demostración: (tag, condición, umbral, banda muerta, persistencia s, prioridad, mensaje).
 # Cloro: NCh409/1 exige entre 0,2 y 2,0 mg/L de cloro libre residual. THD: IEEE 519, baja tensión.
 AGUAPOZO_RULES = [
-    ("LT-101", "low", 20, 2, Priority.HIGH, "Nivel bajo del estanque: revisar la bomba P-101 y el consumo."),
-    (
-        "LT-101",
-        "high",
-        95,
-        2,
-        Priority.MEDIUM,
-        "Nivel alto del estanque: riesgo de rebalse, revisar el control de nivel.",
-    ),
-    (
-        "AIT-101",
-        "low",
-        0.2,
-        0.05,
-        Priority.HIGH,
-        "Cloro residual bajo 0,2 mg/L (NCh409): revisar la dosificación D-101.",
-    ),
+    ("LT-101", "low", 20, 2, 60, Priority.HIGH, "Nivel bajo del estanque: revisar la bomba P-101 y el consumo."),
+    ("LT-101", "high", 95, 2, 60, Priority.MEDIUM, "Nivel alto del estanque: riesgo de rebalse, revisar el control."),
+    ("AIT-101", "low", 0.2, 0.05, 30, Priority.HIGH, "Cloro residual bajo 0,2 mg/L (NCh409): revisar la dosificación."),
     (
         "AIT-101",
         "high",
         2.0,
         0.1,
+        30,
         Priority.MEDIUM,
-        "Cloro residual sobre 2,0 mg/L (NCh409): revisar el ajuste de la dosificadora.",
+        "Cloro residual sobre 2,0 mg/L (NCh409): revisar la dosificadora.",
     ),
-    ("P-101", "state", 2, 0, Priority.HIGH, "Falla de la bomba sumergible: verificar protecciones en el tablero."),
-    ("D-101", "state", 2, 0, Priority.MEDIUM, "Falla en la dosificación de cloro: el agua sale sin desinfección."),
+    ("P-101", "state", 2, 0, 0, Priority.HIGH, "Falla de la bomba sumergible: verificar protecciones en el tablero."),
+    ("D-101", "state", 2, 0, 0, Priority.MEDIUM, "Falla en la dosificación de cloro: el agua sale sin desinfección."),
 ]
 METER_RULES = [
-    ("F", "low", 49.5, 0.05, Priority.MEDIUM, "Frecuencia bajo 49,5 Hz."),
-    ("F", "high", 50.5, 0.05, Priority.MEDIUM, "Frecuencia sobre 50,5 Hz."),
-    ("THDV", "high", 8, 0.5, Priority.LOW, "THD de voltaje sobre 8 % (IEEE 519, baja tensión)."),
+    ("F", "low", 49.5, 0.05, 10, Priority.MEDIUM, "Frecuencia bajo 49,5 Hz."),
+    ("F", "high", 50.5, 0.05, 10, Priority.MEDIUM, "Frecuencia sobre 50,5 Hz."),
+    ("THDV", "high", 8, 0.5, 60, Priority.LOW, "THD de voltaje sobre 8 % (IEEE 519, baja tensión)."),
+]
+# Pérdida de comunicación: (código del dispositivo, segundos sin datos, prioridad, mensaje).
+COMM_RULES = [
+    (
+        "aguapozo",
+        "cbox-01",
+        60,
+        Priority.HIGH,
+        "Sin datos del gateway de AguaPozo: revisar energía y enlace de la CBOX.",
+    ),
+    *[
+        ("medidores-electricos", f"med-0{n}", 120, Priority.MEDIUM, "Sin datos del medidor: revisar gateway y bus.")
+        for n in range(1, 6)
+    ],
 ]
 DEMO_OPERATORS = {"aguapozo"}
 
@@ -264,11 +265,22 @@ class Command(BaseCommand):
         specs = [(projects["aguapozo"], *rule) for rule in AGUAPOZO_RULES]
         for code, _, _ in METERS:
             specs += [(projects["medidores-electricos"], f"{code}-{suffix}", *rest) for suffix, *rest in METER_RULES]
-        for project, tag, condition, threshold, deadband, priority, message in specs:
-            signal = Signal.objects.get(project=project, tag=tag)
+        for project, tag, condition, threshold, deadband, on_delay, priority, message in specs:
             AlarmRule.objects.update_or_create(
-                signal=signal,
+                signal=Signal.objects.get(project=project, tag=tag),
                 condition=condition,
-                defaults={"threshold": threshold, "deadband": deadband, "priority": priority, "message": message},
+                defaults={
+                    "threshold": threshold,
+                    "deadband": deadband,
+                    "on_delay": on_delay,
+                    "priority": priority,
+                    "message": message,
+                },
             )
-        return len(specs)
+        for slug, code, seconds, priority, message in COMM_RULES:
+            AlarmRule.objects.update_or_create(
+                device=Device.objects.get(project=projects[slug], code=code),
+                condition=AlarmRule.Condition.COMM,
+                defaults={"threshold": seconds, "priority": priority, "message": message},
+            )
+        return len(specs) + len(COMM_RULES)

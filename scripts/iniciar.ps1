@@ -1,6 +1,6 @@
-﻿# Levanta Hail en local: backend, simulador de datos y pantallas, cada uno en su
-# ventana, y abre el navegador. Se ejecuta con doble clic en iniciar.cmd.
-# Para apagar Hail basta con cerrar las tres ventanas.
+﻿# Levanta Hail en local: backend, simulador de datos, revisión de alarmas y
+# pantallas, cada uno en su ventana, y abre el navegador. Se ejecuta con doble clic en iniciar.cmd.
+# Para apagar Hail basta con cerrar las cuatro ventanas.
 
 $ErrorActionPreference = 'Continue'
 $Raiz = Split-Path -Parent $PSScriptRoot
@@ -73,6 +73,7 @@ if (Responde $UrlSalud) {
 
     Abrir-Ventana 'Backend' $Backend "& '.\.venv\Scripts\python.exe' manage.py runserver 127.0.0.1:8000"
     Abrir-Ventana 'Simulador de datos' $Backend "& '.\.venv\Scripts\python.exe' manage.py simulate_telemetry --direct --fault dosing"
+    Abrir-Ventana 'Revision de alarmas' $Backend "& '.\.venv\Scripts\python.exe' manage.py check_alarms --loop"
     Abrir-Ventana 'Pantallas' $Frontend 'npm.cmd run dev'
 
     if (-not (Esperar $UrlSalud 'al backend')) { Falla 'el backend no partió. Mira la ventana "Hail - Backend".' }
@@ -86,6 +87,6 @@ Write-Host '  Hail está funcionando:' -ForegroundColor Green
 Write-Host "    Pantallas:       $UrlPortal  (entra con tu cuenta de administrador)"
 Write-Host "    Administración:  $UrlAdmin"
 Write-Host ''
-Write-Host '  Para apagarlo, cierra las ventanas "Hail - Backend", "Hail - Simulador de datos" y "Hail - Pantallas".'
+Write-Host '  Para apagarlo, cierra las cuatro ventanas "Hail - ..." (Backend, Simulador de datos, Revision de alarmas y Pantallas).'
 Write-Host '  Esta ventana ya se puede cerrar.'
 Write-Host ''

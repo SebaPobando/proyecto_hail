@@ -15,6 +15,7 @@ from ninja.errors import HttpError
 from apps.alarms.models import Alarm
 from apps.projects.models import Project
 from apps.projects.permissions import can_operate, visible_project
+from apps.realtime.events import notify_on_commit
 
 from .models import WorkItem, WorkItemEvent
 from .schemas import NoteIn, WorkItemIn, WorkItemOut, WorkItemPatch
@@ -70,8 +71,9 @@ def create_item(request, payload: WorkItemIn):
             alarm=alarm,
             created_by=request.user,
         )
-        text = f"Creado desde la alarma de {alarm.rule.signal.tag}" if alarm else "Seguimiento creado"
+        text = f"Creado desde la alarma de {alarm.rule.subject}" if alarm else "Seguimiento creado"
         WorkItemEvent.objects.create(item=item, kind=WorkItemEvent.Kind.CREATED, text=text, author=request.user)
+        notify_on_commit(project.slug, "work_items")
     return Status(201, items_for(request.user).get(pk=item.pk))
 
 
@@ -102,6 +104,7 @@ def update_item(request, item_id: int, payload: WorkItemPatch):
                     for text in changes
                 ]
             )
+            notify_on_commit(item.project.slug, "work_items")
     return items_for(request.user).get(pk=item.pk)
 
 
@@ -115,4 +118,5 @@ def add_note(request, item_id: int, payload: NoteIn):
     with transaction.atomic():
         WorkItemEvent.objects.create(item=item, kind=WorkItemEvent.Kind.NOTE, text=text, author=request.user)
         WorkItem.objects.filter(pk=item.pk).update(updated_at=timezone.now())
+        notify_on_commit(item.project.slug, "work_items")
     return Status(201, items_for(request.user).get(pk=item.pk))

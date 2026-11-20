@@ -5,4 +5,9 @@ django-environ>=0.12
 email-validator>=2.2
 psycopg[binary]>=3.2
 uvicorn>=0.32
+channels>=4.3,<5
+channels-redis>=4.3,<5
+# redis-py 8 corta por tiempo la espera bloqueante de channels-redis 4.3 ("Timeout reading from").
+redis>=5,<8
+daphne>=4.2,<5
 paho-mqtt>=2.1

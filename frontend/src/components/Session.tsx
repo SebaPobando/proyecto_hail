@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { ApiError, onUnauthorized } from '../services/api';
+import { live } from '../services/live';
 import {
   confirmPasswordReset,
   getMe,
@@ -169,6 +170,14 @@ export default function Session() {
       });
     return () => controller.abort();
   }, [retry]);
+
+  // Avisos en vivo mientras haya sesión.
+  const userId = me?.id;
+  useEffect(() => {
+    if (userId === undefined) return;
+    live.start();
+    return () => live.stop();
+  }, [userId]);
 
   useEffect(() => onUnauthorized(() => {
     setMe(current => {

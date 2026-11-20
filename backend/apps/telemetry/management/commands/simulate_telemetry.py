@@ -3,6 +3,9 @@
     python manage.py simulate_telemetry --direct     # sin broker: escribe directo en la base
     python manage.py simulate_telemetry              # publica en el broker MQTT (requiere ingest_mqtt)
 
+En modo directo el simulador hace también de worker: en cada ciclo revisa las
+alarmas de pérdida de comunicación.
+
 Opciones: --interval segundos entre muestras (10), --count cantidad de ciclos (0 = sin fin),
 --fault pump|dosing para provocar una falla de AguaPozo al partir (y ver sus alarmas),
 --no-faults para no simular fallas al azar. Todos los datos llevan calidad "simulated".
@@ -15,6 +18,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
+from apps.alarms.services import check_communication_and_notify
 from apps.telemetry.mqtt import build_client
 from apps.telemetry.services import IngestError, ingest
 from apps.telemetry.simulator import FAULTS, AguaPozoSimulator, default_meters
@@ -74,6 +78,8 @@ class Command(BaseCommand):
                 send(aguapozo.topic, aguapozo.next_payload(now))
                 for meter in meters:
                     send(meter.topic, meter.next_payload(now, interval))
+                if client is None:
+                    check_communication_and_notify()
                 cycle += 1
                 fault = f" · falla simulada: {aguapozo.fault}" if aguapozo.fault else ""
                 self.stdout.write(f"{now:%H:%M:%S} ciclo {cycle}: AguaPozo + {len(meters)} medidores{fault}")

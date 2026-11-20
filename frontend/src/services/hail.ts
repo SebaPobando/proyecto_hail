@@ -172,13 +172,16 @@ export interface Alarm {
   tag: string;
   description: string;
   unit: string;
-  /** Texto de la regla, por ejemplo "≤ 0,2 mg/L" o "= Falla". */
+  /** "signal": alto, bajo o estado de una señal. "communication": un dispositivo dejó de enviar datos. */
+  kind: 'signal' | 'communication';
+  /** Texto de la regla, por ejemplo "≤ 0,2 mg/L", "= Falla" o "sin datos por más de 60 s". */
   condition: string;
   priority: AlarmPriority;
   message: string;
   state: AlarmState;
   raised_at: string;
-  raise_value: number;
+  /** En comunicación: segundos sin datos; null si el dispositivo nunca envió. */
+  raise_value: number | null;
   cleared_at: string | null;
   clear_value: number | null;
   acknowledged_at: string | null;

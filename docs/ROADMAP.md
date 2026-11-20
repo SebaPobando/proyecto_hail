@@ -23,6 +23,6 @@ Las semanas son de trabajo efectivo, no fechas de calendario.
 | F2 | Listo | Definir la retención del dato crudo con cada cliente |
 | F3 | Listo | Conectar el PLC de Nutrial (su esquema de proceso sigue simulado en el navegador) |
 | F4a | Listo | Aprobar con ingeniería los límites de alarma de cada instalación real |
-| F4b | Siguiente | Tiempo real por WebSocket; avisos por correo o mensajería; persistencia y alarma por pérdida de comunicación |
-| F5 | Pendiente | — |
+| F4b | Listo | Avisos externos (correo o mensajería) cuando se decida quién los recibe |
+| F5 | Siguiente | Servidor, TLS, respaldos, observabilidad y piloto en paralelo |
 | F6 | Listo (en F3) | — |

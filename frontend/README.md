@@ -13,7 +13,7 @@ npm.cmd test           # pruebas (Vitest)
 npm.cmd run build      # revisión de tipos y compilación de producción
 ```
 
-Vite reenvía `/api`, `/admin` y `/static` al backend. Para usar otro backend: `$env:HAIL_BACKEND_URL="http://otra-direccion:8000"` antes de `npm.cmd run dev`.
+Vite reenvía `/api`, `/admin`, `/static` y el WebSocket `/ws` al backend. Para usar otro backend: `$env:HAIL_BACKEND_URL="http://otra-direccion:8000"` antes de `npm.cmd run dev`.
 
 ## Estructura
 
@@ -24,7 +24,8 @@ src/
 ├── services/
 │   ├── api.ts              fetch con sesión, CSRF y aviso de 401
 │   ├── hail.ts             endpoints y tipos de la API
-│   ├── usePolling.ts       consulta periódica
+│   ├── usePolling.ts       consulta periódica; refresca al instante con avisos en vivo
+│   ├── live.ts             WebSocket /ws/updates: avisos en vivo con reconexión
 │   ├── aguapozo.ts         adaptador de AguaPozo (lectura actual e historial)
 │   ├── meters.ts           adaptador de medidores eléctricos y resúmenes
 │   ├── projectStatus.ts    estado de datos por proyecto

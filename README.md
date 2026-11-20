@@ -115,7 +115,8 @@ La plataforma ya dejó atrás el prototipo (Node + Firebase): hoy todo corre sob
 | F2 · Recepción de datos | Broker MQTT, validación, base de datos de series de tiempo, historial | **Listo** (falta definir cuánto tiempo se guardan los datos crudos) |
 | F3 · Pantallas conectadas | Las HMI leen desde la nueva plataforma; inicio de sesión propio; cada cliente ve solo lo suyo | **Listo** |
 | F4a · Alarmas y bitácora | Reglas de alarma por señal, reconocimiento con autor, bitácora compartida; avisos solo en pantalla | **Listo** |
-| F4b · Tiempo real y avisos | Pantallas en vivo por WebSocket; avisos por correo o mensajería | Pendiente |
+| F4b · Tiempo real | Pantallas en vivo por WebSocket; persistencia de alarmas; alarma por pérdida de comunicación | **Listo** |
+| Avisos externos | Correo o mensajería cuando se activa una alarma | Pendiente (por ahora, solo en pantalla) |
 | F5 · Producción | Servidor, cifrado, respaldos, monitoreo; piloto con AguaPozo en datos reales | Pendiente |
 | F6 · Cierre de migración | Retiro del prototipo y de Firebase | **Listo** (se adelantó a F3: Firebase no tenía usuarios reales) |
 
@@ -143,7 +144,7 @@ Esta sección es para quien desarrolla o despliega la plataforma.
 | API y administración | Python · Django 5.2 + Django Ninja |
 | Base de datos | PostgreSQL + TimescaleDB (series de tiempo) |
 | Mensajería con equipos | MQTT (Mosquitto en desarrollo) |
-| Tiempo real y tareas (F4b) | Redis, Django Channels, Celery |
+| Tiempo real (F4b) | Django Channels (servidor Daphne) y Redis |
 | Despliegue (F5) | Docker Compose + Caddy (HTTPS) |
 
 Los motivos de cada decisión están en [docs/adr/](docs/adr/).
@@ -209,6 +210,8 @@ docker compose -f infra/compose.yaml up -d --wait db redis
 
 La primera vez descarga las imágenes y tarda unos minutos. Sin Docker, sáltate este paso.
 
+Con Docker, en el paso 3 descomenta en `backend\.env` la línea `REDIS_URL=redis://127.0.0.1:6379/0`: las pantallas se actualizan al instante (indicador **En vivo**). Sin Redis funcionan igual, consultando cada pocos segundos (**Actualización periódica**).
+
 ### Paso 3 · Backend (terminal 1)
 
 ```powershell
@@ -239,6 +242,8 @@ cd backend
 .\.venv\Scripts\Activate.ps1
 python manage.py simulate_telemetry --direct --fault dosing   # lecturas simuladas cada 10 s; parte con una falla para ver alarmas
 ```
+
+En modo directo el simulador también revisa las alarmas de comunicación. Si lo detienes y quieres que esa revisión siga, en otra terminal: `python manage.py check_alarms --loop`.
 
 ### Paso 5 · Pantallas (terminal 3)
 
@@ -337,6 +342,6 @@ Las pruebas usan SQLite en memoria y no dependen de tu `backend\.env`. Para corr
 - [Roadmap](docs/ROADMAP.md): fases, entregables y fechas estimadas.
 - [Arquitectura](docs/ARQUITECTURA.md): componentes, modelo de datos, API y convenciones del código.
 - [Protocolo MQTT](docs/PROTOCOLO_MQTT.md): cómo debe publicar un equipo de campo; qué falta de la CBOX.
-- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system, sesión y mismo origen, alarmas.
+- [Decisiones](docs/adr/): por qué este stack, por qué este modelo multicliente, broker MQTT, design system, sesión y mismo origen, alarmas, tiempo real.
 - [Design system](frontend/src/design-system/README.md): reglas de color, tipografía, estados y componentes.
 - [Operación del prototipo](docs/legacy/OPERACION.md): documento histórico; sirve como lista de verificaciones para la fase F5.

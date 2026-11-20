@@ -1,4 +1,4 @@
-from .context import current_actor
+from .context import current_request
 
 
 class CurrentActorMiddleware:
@@ -6,8 +6,8 @@ class CurrentActorMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        token = current_actor.set(getattr(request, "user", None))
+        token = current_request.set(request)
         try:
             return self.get_response(request)
         finally:
-            current_actor.reset(token)
+            current_request.reset(token)

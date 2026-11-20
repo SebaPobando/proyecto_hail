@@ -37,7 +37,7 @@ const statusText: Record<string, string> = {
 /** HMI de agua potable (pozo, estanque y cloración) con datos de la API de Hail. */
 export default function WaterHmi({ project, back }: { project: ProjectSummary; back: ReactNode }) {
   const [screen, setScreen] = useRouteValue('waterScreen', 'process', ['process', 'trends', 'alarms']);
-  const latest = usePolling(signal => getLatest(project.slug, signal), POLL_MS, `latest:${project.slug}`);
+  const latest = usePolling(signal => getLatest(project.slug, signal), POLL_MS, `latest:${project.slug}`, true, { kinds: ['telemetry'], project: project.slug });
   const history = useMemo(() => createApiHistory(project.slug), [project.slug]);
 
   const candidate = toWaterTelemetry(latest.data);

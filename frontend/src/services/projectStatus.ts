@@ -57,6 +57,7 @@ export function useProjectsDataStatus(projects: readonly ProjectSummary[], enabl
     15_000,
     `status:${slugs.join('|')}`,
     enabled && slugs.length > 0,
+    { kinds: ['telemetry'] },
   );
   const statuses: Record<string, DataStatus> = {};
   slugs.forEach((slug, index) => {

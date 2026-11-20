@@ -3,12 +3,15 @@
 from datetime import timedelta
 
 import pytest
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.alarms.evaluation import check_communication
 from apps.alarms.models import Alarm, AlarmRule
 from apps.audit.models import AuditLog
+from apps.projects.models import Device
 from apps.telemetry.services import ingest
 from apps.tenancy.models import Membership, Organization
 
@@ -19,6 +22,8 @@ from .test_telemetry import AGUAPOZO, MED01, payload_hail_v1, payload_test_v1
 @pytest.fixture
 def seeded(db):
     call_command("seed_demo")
+    # Las pruebas de activación asumen alarmas inmediatas; la persistencia se prueba aparte.
+    AlarmRule.objects.update(on_delay=0)
 
 
 @pytest.fixture
@@ -109,6 +114,90 @@ class TestEvaluation:
     def test_describe_uses_units_and_state_labels(self, seeded):
         assert AlarmRule.objects.get(signal__tag="AIT-101", condition="low").describe() == "≤ 0,2 mg/L"
         assert AlarmRule.objects.get(signal__tag="P-101").describe() == "= Falla"
+
+
+@pytest.mark.django_db
+class TestOnDelay:
+    def test_condition_must_persist_before_raising(self, seeded, now):
+        AlarmRule.objects.filter(signal__tag="AIT-101", condition="low").update(on_delay=30)
+        send_water(now, chlorine=0.15)
+        send_water(now + timedelta(seconds=20), chlorine=0.15)
+        assert not alarms_of("AIT-101").exists()
+        rule = AlarmRule.objects.get(signal__tag="AIT-101", condition="low")
+        assert rule.pending_since == now
+        send_water(now + timedelta(seconds=30), chlorine=0.15)
+        alarm = alarms_of("AIT-101").get()
+        assert alarm.raised_at == now + timedelta(seconds=30)
+        rule.refresh_from_db()
+        assert rule.pending_since is None
+
+    def test_a_short_spike_does_not_raise(self, seeded, now):
+        AlarmRule.objects.filter(signal__tag="AIT-101", condition="low").update(on_delay=30)
+        send_water(now, chlorine=0.15)
+        send_water(now + timedelta(seconds=10), chlorine=0.6)  # vuelve a lo normal: se reinicia el conteo
+        send_water(now + timedelta(seconds=20), chlorine=0.15)
+        send_water(now + timedelta(seconds=40), chlorine=0.15)
+        assert not alarms_of("AIT-101").exists()
+        assert AlarmRule.objects.get(signal__tag="AIT-101", condition="low").pending_since == now + timedelta(
+            seconds=20
+        )
+
+
+@pytest.mark.django_db
+class TestCommunication:
+    def comm_alarm(self, code):
+        return Alarm.objects.filter(rule__device__code=code, rule__condition="comm")
+
+    def test_device_that_never_reported_raises_without_value(self, seeded, now):
+        result = check_communication(now)
+        codes = sorted(a.rule.device.code for a in result.raised)
+        assert codes == ["cbox-01", "med-01", "med-02", "med-03", "med-04", "med-05"]
+        alarm = self.comm_alarm("med-04").get()
+        assert alarm.raise_value is None
+        assert alarm.rule.describe() == "sin datos por más de 120 s"
+        # Otra revisión no duplica.
+        assert check_communication(now + timedelta(seconds=15)).raised == []
+
+    def test_silence_beyond_threshold_raises_and_new_data_clears_it(self, seeded, now):
+        send_water(now)
+        check_communication(now + timedelta(seconds=59))
+        assert not self.comm_alarm("cbox-01").exists()
+        check_communication(now + timedelta(seconds=90))
+        alarm = self.comm_alarm("cbox-01").get()
+        assert alarm.raise_value == 90
+        assert alarm.simulated is False
+        later = now + timedelta(seconds=100)
+        result = send_water(later)
+        assert result.alarms_cleared == 1
+        alarm.refresh_from_db()
+        assert alarm.cleared_at == later
+        assert alarm.state == Alarm.State.CLEARED_UNACK
+
+    def test_command_runs_the_check(self, seeded, monkeypatch):
+        # En PostgreSQL cerraría la conexión de la transacción de la prueba.
+        monkeypatch.setattr("apps.alarms.management.commands.check_alarms.close_old_connections", lambda: None)
+        call_command("check_alarms")
+        assert self.comm_alarm("cbox-01").exists()
+
+    def test_inactive_device_is_not_checked(self, seeded, now):
+        Device.objects.filter(code="med-05").update(is_active=False)
+        check_communication(now)
+        assert not self.comm_alarm("med-05").exists()
+
+    def test_api_presents_device_rules(self, seeded, now, client_for, platform_admin):
+        check_communication(now)
+        alarm = next(a for a in client_for(platform_admin).get("/api/alarms").json() if a["tag"] == "cbox-01")
+        assert alarm["kind"] == "communication"
+        assert alarm["description"] == "Gateway Haiwell CBOX: comunicación"
+        assert alarm["unit"] == "s"
+        assert alarm["raise_value"] is None
+
+    def test_rule_validation(self, seeded):
+        device = Device.objects.get(code="cbox-01")
+        with pytest.raises(ValidationError):
+            AlarmRule(device=device, condition="comm", threshold=5).full_clean()
+        with pytest.raises(ValidationError):
+            AlarmRule(device=device, condition="high", threshold=5).full_clean()
 
 
 @pytest.fixture

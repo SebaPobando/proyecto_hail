@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { HailLogo } from '../design-system';
 import { alarmTotals, priorityLabel } from '../services/alarms';
+import { useLiveStatus } from '../services/live';
 import { getAlarmSummary, type AlarmSummary, type HmiType, type Me, type ProjectSummary } from '../services/hail';
 import { usePolling } from '../services/usePolling';
 import { useRouteValue } from '../services/navigation';
@@ -46,6 +47,16 @@ function PortalIcon({ hmi, path }: { hmi?: HmiType; path?: string }) {
   </svg>;
 }
 
+/** Indica si las pantallas reciben avisos al instante o se actualizan cada pocos segundos. */
+function LiveBadge() {
+  const status = useLiveStatus();
+  if (status === 'live') {
+    return <span className="live-badge is-live" title="Las pantallas se actualizan apenas llegan datos o cambian las alarmas.">En vivo</span>;
+  }
+  if (status === 'connecting') return <span className="live-badge">Conectando…</span>;
+  return <span className="live-badge" title="Sin avisos en vivo (por ejemplo, sin Redis): las pantallas se actualizan cada pocos segundos.">Actualización periódica</span>;
+}
+
 /** Aviso sobre cada HMI cuando el proyecto tiene alarmas abiertas. */
 function AlarmStrip({ summary, onOpen }: { summary?: AlarmSummary; onOpen: () => void }) {
   if (!summary) return null;
@@ -72,7 +83,7 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
   const [view, setView] = useRouteValue('view', 'portal', ['portal', 'standalone']);
   const project = projects.find(item => item.slug === route);
   const statuses = useProjectsDataStatus(projects, !project);
-  const alarmPoll = usePolling(getAlarmSummary, 10_000, `alarm-summary:${me.id}`, projects.length > 0);
+  const alarmPoll = usePolling(getAlarmSummary, 10_000, `alarm-summary:${me.id}`, projects.length > 0, { kinds: ['alarms'] });
   const alarmSummary = alarmPoll.data ?? [];
   const totals = alarmTotals(alarmSummary);
   const navigate = (slug: string | null) => setRoute(slug ?? '');
@@ -105,6 +116,7 @@ export default function ProjectPortal({ me, projects, logout }: { me: Me; projec
       <strong>Supervisión industrial IoT</strong>
       <div>
         {standalone && <button onClick={() => setView('portal')}>Mostrar menú de proyectos</button>}
+        <LiveBadge/>
         {me.is_platform_admin && <a href="/admin/" target="_blank" rel="noopener noreferrer">Administración ↗</a>}
         <span>{role}</span>
         {logout}

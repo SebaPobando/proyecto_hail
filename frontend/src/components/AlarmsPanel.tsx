@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { StatusBadge } from '../design-system';
 import {
-  canOperate, duration, formatValue, needsAck, priorityLabel, priorityRank, priorityTone, stateLabel,
+  canOperate, duration, formatValue, needsAck, priorityLabel, priorityRank, priorityTone, raiseLabel, stateLabel,
 } from '../services/alarms';
 import { acknowledgeAlarm, createWorkItem, listAlarms, type Alarm, type ProjectSummary } from '../services/hail';
 import { usePolling } from '../services/usePolling';
@@ -71,10 +71,10 @@ function AlarmRow({ alarm, project, showProject, onChanged }: {
     {alarm.message && <p className="alarm-message">{alarm.message}</p>}
     <dl>
       <div><dt>Condición</dt><dd>{alarm.condition}</dd></div>
-      <div><dt>Valor al activarse</dt><dd>{formatValue(alarm.raise_value, alarm.unit)}</dd></div>
+      <div><dt>{raiseLabel(alarm).label}</dt><dd>{raiseLabel(alarm).value}</dd></div>
       <div><dt>Desde</dt><dd><time dateTime={alarm.raised_at}>{time(alarm.raised_at)}</time></dd></div>
       <div><dt>{alarm.cleared_at ? 'Normalizada' : 'Duración'}</dt><dd>{alarm.cleared_at
-        ? <><time dateTime={alarm.cleared_at}>{time(alarm.cleared_at)}</time> · {formatValue(alarm.clear_value, alarm.unit)}</>
+        ? <><time dateTime={alarm.cleared_at}>{time(alarm.cleared_at)}</time>{alarm.kind === 'signal' && <> · {formatValue(alarm.clear_value, alarm.unit)}</>}</>
         : duration(alarm.raised_at)}</dd></div>
     </dl>
     {alarm.acknowledged_at && <p className="alarm-ack">Reconocida por {alarm.acknowledged_by ?? 'usuario eliminado'} el {time(alarm.acknowledged_at)}{alarm.ack_comment && <>: “{alarm.ack_comment}”</>}</p>}
@@ -102,7 +102,7 @@ export default function AlarmsPanel({ projects, project, showProject = false }: 
   showProject?: boolean;
 }) {
   const [status, setStatus] = useState<'open' | 'all'>('open');
-  const poll = usePolling(signal => listAlarms({ project, status, signal }), status === 'open' ? 5000 : 30_000, `alarms:${project ?? '*'}:${status}`);
+  const poll = usePolling(signal => listAlarms({ project, status, signal }), status === 'open' ? 5000 : 30_000, `alarms:${project ?? '*'}:${status}`, true, { kinds: ['alarms'], project });
   const bySlug = new Map(projects.map(item => [item.slug, item]));
   const alarms = (poll.data ?? []).filter(alarm => bySlug.has(alarm.project));
   const shown = status === 'open' ? sortAlarms(alarms) : alarms;

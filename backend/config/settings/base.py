@@ -22,12 +22,15 @@ CSRF_TRUSTED_ORIGINS = env.list(
 )
 
 INSTALLED_APPS = [
+    # daphne primero: `runserver` sirve ASGI, incluido el WebSocket de actualizaciones en vivo.
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     # Apps de Hail
     "apps.accounts",
     "apps.tenancy",
@@ -36,6 +39,7 @@ INSTALLED_APPS = [
     "apps.telemetry",
     "apps.alarms",
     "apps.operations",
+    "apps.realtime",
 ]
 
 MIDDLEWARE = [
@@ -126,4 +130,17 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": env("DJANGO_LOG_LEVEL", default="INFO")},
+}
+
+# --- Tiempo real (Django Channels) ------------------------------------------
+# Los avisos "cambió algo en el proyecto X" viajan del worker de ingesta al
+# servidor web por Redis. Sin REDIS_URL se usa una capa en memoria, que no
+# cruza procesos: el WebSocket conecta, pero las pantallas siguen consultando
+# periódicamente (REALTIME_LIVE = False se lo indica al navegador).
+REDIS_URL = env("REDIS_URL", default="")
+REALTIME_LIVE = bool(REDIS_URL)
+CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels_redis.core.RedisChannelLayer", "CONFIG": {"hosts": [REDIS_URL]}}
+    if REDIS_URL
+    else {"BACKEND": "channels.layers.InMemoryChannelLayer"}
 }

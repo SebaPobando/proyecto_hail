@@ -49,6 +49,8 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.dev
       DATABASE_URL: postgres://hail:hail@db:5432/hail
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      # Avisos en vivo entre el worker y el servidor web (WebSocket /ws/updates)
+      REDIS_URL: redis://redis:6379/0
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -56,6 +58,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   ingest:
     profiles: ["app"]
@@ -65,6 +69,7 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.dev
       DATABASE_URL: postgres://hail:hail@db:5432/hail
       HAIL_MQTT_URL: mqtt://mqtt:1883
+      REDIS_URL: redis://redis:6379/0
     env_file:
       # Credenciales MQTT de la cuenta de ingesta (HAIL_MQTT_USERNAME / HAIL_MQTT_PASSWORD)
       - path: ../backend/.env
@@ -75,6 +80,8 @@ services:
       db:
         condition: service_healthy
       mqtt:
+        condition: service_started
+      redis:
         condition: service_started
     restart: unless-stopped
 

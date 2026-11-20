@@ -68,13 +68,13 @@ Si aparece un texto en rojo que dice **ERROR**, mira [Si algo falla](#si-algo-fa
 
 En la carpeta `proyecto_hail`, haz **doble clic en `iniciar.cmd`**.
 
-1. Se abren **tres ventanas nuevas**: "Hail - Backend", "Hail - Simulador de datos" y "Hail - Pantallas". Son las partes de Hail funcionando. **No las cierres mientras lo uses** (puedes minimizarlas).
+1. Se abren **cuatro ventanas nuevas**: "Hail - Backend", "Hail - Simulador de datos", "Hail - Revision de alarmas" y "Hail - Pantallas". Son las partes de Hail funcionando. **No las cierres mientras lo uses** (puedes minimizarlas).
 2. Cuando todo responda, se abre sola una pestaña del navegador con la pantalla de **inicio de sesión** de Hail. Entra con el correo y la contraseña del paso 3.
 3. La primera ventana (la de `iniciar.cmd`) ya se puede cerrar.
 
 Si Windows pregunta si permites el acceso de Python o Node.js en el firewall, puedes darle **Cancelar**: Hail funciona solo dentro de tu computador.
 
-**Para apagar Hail**, cierra las tres ventanas "Hail - …". La próxima vez, doble clic en `iniciar.cmd` otra vez. Los datos quedan guardados.
+**Para apagar Hail**, cierra las cuatro ventanas "Hail - …". La próxima vez, doble clic en `iniciar.cmd` otra vez. Los datos quedan guardados.
 
 ## Paso 5 · Qué mirar
 
@@ -98,7 +98,13 @@ Al abrir Hail con `iniciar.cmd`, el simulador provoca una **falla de la dosifica
 
 Prueba los roles: `cliente-aguapozo@hail.local` es **operador** y puede reconocer; `cliente-ulagos@hail.local` y `cliente-nutrial@hail.local` son **lectores**: ven, pero no reconocen ni escriben.
 
+**Alarmas de comunicación.** Hail también avisa cuando un equipo deja de enviar datos. Los medidores 4 y 5 nunca envían (a propósito), así que siempre verás sus alarmas "sin comunicación". Para ver una aparecer: **cierra la ventana "Hail - Simulador de datos"**; en uno o dos minutos salta la alarma del gateway de AguaPozo (prioridad alta). Al volver a abrir Hail con `iniciar.cmd`, los datos regresan y la alarma se normaliza sola (queda esperando que alguien la reconozca).
+
+**Persistencia.** Algunas reglas esperan antes de activarse (por ejemplo, el cloro bajo debe mantenerse 30 segundos) para no alarmar por un pico breve. Se configura en cada regla, en "persistencia".
+
 > Por ahora los avisos son **solo en pantalla**: Hail no envía correos ni mensajes.
+
+**"Actualización periódica" arriba a la derecha** es lo normal en esta prueba: sin Docker no hay avisos en vivo y las pantallas se actualizan cada pocos segundos. Con Docker y Redis el indicador dice **En vivo** y los cambios llegan al instante.
 
 **Prueba el aislamiento entre clientes.** Cierra sesión (arriba a la derecha) y entra como un cliente, por ejemplo `cliente-aguapozo@hail.local` con la contraseña `hail-demo-2026`. Ese usuario solo ve AguaPozo: los otros proyectos no aparecen ni escribiendo su dirección. Los otros clientes de prueba son `cliente-ulagos@hail.local` y `cliente-nutrial@hail.local` (misma contraseña).
 
@@ -131,7 +137,7 @@ Anota lo que veas (una captura con una nota sirve) y se lo mandas a Seba.
 
 Cuando haya cambios nuevos:
 
-1. Cierra las tres ventanas de Hail si estaban abiertas.
+1. Cierra las cuatro ventanas de Hail si estaban abiertas.
 2. Abre PowerShell y pega:
 
    ```powershell
@@ -153,6 +159,7 @@ Lo primero: **una captura de la ventana con el error se la mandas a Seba**. Ante
 | Al hacer `git clone` dice `Repository not found` o pide permisos | Tu cuenta de GitHub todavía no tiene acceso: pídele a Seba que te agregue al repositorio. |
 | "no se pudo instalar las librerías…" | Casi siempre es internet. Revisa la conexión y vuelve a hacer doble clic en `instalar.cmd`; continúa donde quedó. |
 | "Hail no está instalado todavía" | Falta el paso 3: doble clic en `instalar.cmd`. |
+| La ventana "Hail - Revision de alarmas" muestra un error | Suele ser que la base de datos todavía no estaba lista. Ciérrala y vuelve a abrir Hail con `iniciar.cmd`. |
 | "el backend no partió" | Mira la ventana "Hail - Backend". Si dice `That port is already in use`, hay otra copia de Hail abierta: cierra todas las ventanas "Hail - …" y vuelve a abrir con `iniciar.cmd`. Si no, reinicia el computador y prueba de nuevo. |
 | "las pantallas no partieron" | Mira la ventana "Hail - Pantallas". Si dice que el puerto 5173 está ocupado, cierra todas las ventanas "Hail - …" y vuelve a abrir. |
 | Windows muestra "Windows protegió su PC" al abrir un `.cmd` | Pasa si el proyecto se descargó como ZIP. Clic en **Más información → Ejecutar de todas formas**. |

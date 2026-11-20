@@ -18,7 +18,7 @@ export function formatReading(reading: LatestReading): string {
 
 /** Pantalla para proyectos sin HMI propia: la lectura actual de cada señal. */
 export default function GenericHmi({ project }: { project: ProjectSummary }) {
-  const latest = usePolling(signal => getLatest(project.slug, signal), 5000, `generic:${project.slug}`);
+  const latest = usePolling(signal => getLatest(project.slug, signal), 5000, `generic:${project.slug}`, true, { kinds: ['telemetry'], project: project.slug });
   const summary = summarizeLatest(latest.data, latest.error);
   const readings = latest.data?.readings ?? [];
   return <section className="ds-card generic-hmi" aria-label={`Señales de ${project.name}`}>

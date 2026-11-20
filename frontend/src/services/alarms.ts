@@ -1,6 +1,6 @@
 /** Etiquetas, tonos y permisos de alarmas y bitácora para las pantallas. */
 import type { StatusTone } from '../design-system';
-import type { AlarmPriority, AlarmState, AlarmSummary, ProjectSummary, WorkPriority, WorkStatus } from './hail';
+import type { Alarm, AlarmPriority, AlarmState, AlarmSummary, ProjectSummary, WorkPriority, WorkStatus } from './hail';
 
 export const priorityLabel: Record<AlarmPriority, string> = { high: 'Alta', medium: 'Media', low: 'Baja' };
 /** Alta = crítica (rojo), media = advertencia (ámbar), baja = información. Nunca el naranjo de marca. */
@@ -39,6 +39,17 @@ export function duration(fromIso: string, to: number | string = Date.now()): str
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} h ${String(minutes % 60).padStart(2, '0')} min`;
   return `${Math.floor(hours / 24)} d ${hours % 24} h`;
+}
+
+/** Valor con que se activó la alarma, en palabras para las de comunicación. */
+export function raiseLabel(alarm: Pick<Alarm, 'kind' | 'raise_value' | 'unit'>): { label: string; value: string } {
+  if (alarm.kind === 'communication') {
+    return {
+      label: 'Sin datos',
+      value: alarm.raise_value === null ? 'Nunca ha enviado datos' : `${duration(new Date(0).toISOString(), alarm.raise_value * 1000)} sin datos`,
+    };
+  }
+  return { label: 'Valor al activarse', value: formatValue(alarm.raise_value, alarm.unit) };
 }
 
 export interface AlarmTotals { open: number; unacknowledged: number; active: number }

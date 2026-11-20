@@ -9,7 +9,7 @@
 | Base de datos | PostgreSQL + TimescaleDB | F1 (relacional), F2 (hypertable de lecturas) |
 | Broker MQTT | Mosquitto en desarrollo; producción por decidir (EMQX o Mosquitto) | F2 |
 | Ingesta | Worker Python `manage.py ingest_mqtt` (paho-mqtt) | F2 (listo) |
-| Tiempo real y tareas | Redis + Django Channels + Celery | F4b |
+| Tiempo real | Django Channels (Daphne) + Redis | F4b (listo) |
 | Proxy y TLS | Caddy | F5 |
 
 Cadena de datos: PLC → gateway (Haiwell CBOX) → broker MQTT → worker de ingesta → TimescaleDB → API → navegador.
@@ -104,7 +104,20 @@ Ver [ADR 0006](adr/0006-alarmas.md).
 - **Permisos** (`apps/projects/permissions.py`): todos los que ven el proyecto ven sus alarmas y su bitácora; reconocer y escribir exige rol de operador, administrador del cliente o de plataforma. Cada reconocimiento queda en la auditoría.
 - **Bitácora** (`apps/operations`): seguimientos por proyecto con estado, prioridad, responsable, fecha objetivo y eventos con autor. Puede nacer de una alarma.
 - **API**: `GET /api/alarms`, `GET /api/alarms/summary`, `POST /api/alarms/{id}/acknowledge`, `GET|POST /api/work-items`, `PATCH /api/work-items/{id}`, `POST /api/work-items/{id}/notes`.
-- **Pendiente (F4b)**: avisos por correo o mensajería, tiempo de persistencia (on-delay), alarma por pérdida de comunicación y actualización en vivo por WebSocket. Hoy las pantallas consultan cada 5 a 10 segundos.
+- **Persistencia (on-delay)**: una regla puede exigir que la condición se mantenga N segundos antes de activar; filtra picos breves.
+- **Pérdida de comunicación**: reglas por dispositivo ("sin datos por más de N segundos"). Las revisa `check_communication()` cada 15 s desde el worker de ingesta, el simulador en modo directo o `manage.py check_alarms --loop`; la llegada de datos las normaliza en el acto.
+- **Pendiente**: avisos externos (correo o mensajería), cuando se defina quién recibe qué y a qué hora.
+
+## Tiempo real (F4b)
+
+Ver [ADR 0007](adr/0007-tiempo-real.md).
+
+- `runserver` usa Daphne (ASGI): sirve HTTP y el WebSocket `/ws/updates` (`config/asgi.py`, `apps/realtime`). En producción, Daphne o Uvicorn detrás de Caddy (F5).
+- **Avisos sin datos**: el servidor solo dice `{"type": "event", "project": "aguapozo", "kind": "alarms"}`; la pantalla vuelve a pedir los datos por la API, con sus permisos de siempre. Tipos: `telemetry`, `alarms`, `work_items`.
+- **Quién avisa**: la ingesta (al confirmar la transacción), el reconocimiento de alarmas, la bitácora y la revisión de comunicación. Si Redis no responde, el aviso se pierde sin afectar la operación.
+- **Seguridad**: misma sesión de Django; solo se aceptan conexiones cuyo Origin esté en `ALLOWED_HOSTS`; cada conexión se suscribe solo a los proyectos visibles para el usuario al conectarse.
+- **Sin Redis** (`REDIS_URL` vacío) los avisos no cruzan del simulador o del worker al servidor web. El servidor lo dice al conectar (`live: false`) y las pantallas siguen consultando cada pocos segundos. Con Redis, la consulta queda como respaldo cada 60 s.
+- Dependencia: `redis<8`, porque redis-py 8 corta por tiempo la espera bloqueante de channels-redis 4.3.
 
 ## Frontend
 

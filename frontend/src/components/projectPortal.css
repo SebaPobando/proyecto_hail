@@ -179,3 +179,11 @@ body:has(.project-portal) { min-width: 0; }
 .generic-hmi-header h2 { margin: 0; }
 .generic-hmi-header p { margin: var(--space-1) 0 0; color: var(--color-text-muted); }
 .generic-hmi .is-stale td { color: var(--color-text-subtle); }
+
+/* Indicador de actualización en vivo (sobre el encabezado azul) */
+.live-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-pill); border: 1px solid rgb(255 255 255 / 35%); color: rgb(255 255 255 / 85%); font-size: var(--text-sm); white-space: nowrap; }
+.live-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--hail-gray-300); }
+.live-badge.is-live { color: #fff; border-color: rgb(255 255 255 / 60%); }
+.live-badge.is-live::before { background: var(--status-ok-indicator); box-shadow: 0 0 0 0 rgb(120 189 57 / 60%); animation: live-pulse 2s infinite; }
+@keyframes live-pulse { 70% { box-shadow: 0 0 0 7px rgb(120 189 57 / 0%); } 100% { box-shadow: 0 0 0 0 rgb(120 189 57 / 0%); } }
+@media (prefers-reduced-motion: reduce) { .live-badge.is-live::before { animation: none; } }

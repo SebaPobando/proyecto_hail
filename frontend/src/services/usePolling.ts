@@ -1,4 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { live, matches, useLiveStatus, type LiveKind } from './live';
+
+/** Con avisos en vivo, la consulta periódica queda solo como respaldo. */
+export const LIVE_SAFETY_INTERVAL_MS = 60_000;
+const LIVE_DEBOUNCE_MS = 300;
+
+export interface LiveTopics {
+  kinds: readonly LiveKind[];
+  /** Sin proyecto: cualquier proyecto visible. */
+  project?: string;
+}
 
 export interface PollState<T> {
   /** Último dato recibido. Se conserva si una consulta posterior falla. */
@@ -15,13 +26,21 @@ export interface PollState<T> {
  * Consulta `load` al montar y luego cada `intervalMs` (si es mayor que 0).
  * Las consultas no se superponen: la siguiente se programa al terminar la
  * anterior. Cambiar `key` descarta el dato anterior y empieza de nuevo.
+ *
+ * Con `topics`, un aviso en vivo que coincida vuelve a consultar al instante y,
+ * mientras los avisos funcionen, la consulta periódica se espacia a un minuto.
  */
 export function usePolling<T>(
   load: (signal: AbortSignal) => Promise<T>,
   intervalMs: number,
   key: string,
   enabled = true,
+  topics?: LiveTopics,
 ): PollState<T> {
+  const liveStatus = useLiveStatus();
+  const effectiveInterval = topics && liveStatus === 'live' && intervalMs > 0
+    ? Math.max(intervalMs, LIVE_SAFETY_INTERVAL_MS)
+    : intervalMs;
   const [state, setState] = useState<{ key: string; data: T | null; error: Error | null; receivedAt: number | null }>(
     { key, data: null, error: null, receivedAt: null },
   );
@@ -46,16 +65,33 @@ export function usePolling<T>(
           error: error instanceof Error ? error : new Error(String(error)),
         }));
       }
-      if (!controller.signal.aborted && intervalMs > 0) timer = setTimeout(run, intervalMs);
+      if (!controller.signal.aborted && effectiveInterval > 0) timer = setTimeout(run, effectiveInterval);
     }
     void run();
     return () => {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [key, intervalMs, enabled, tick]);
+  }, [key, effectiveInterval, enabled, tick]);
 
   const refresh = useCallback(() => setTick(value => value + 1), []);
+
+  const topicKinds = topics?.kinds.join('|');
+  const topicProject = topics?.project;
+  useEffect(() => {
+    if (!enabled || !topicKinds) return;
+    const kinds = topicKinds.split('|') as LiveKind[];
+    let debounce: ReturnType<typeof setTimeout> | undefined;
+    const stop = live.subscribe(event => {
+      if (!matches(event, kinds, topicProject)) return;
+      clearTimeout(debounce);
+      debounce = setTimeout(refresh, LIVE_DEBOUNCE_MS);
+    });
+    return () => {
+      stop();
+      clearTimeout(debounce);
+    };
+  }, [enabled, topicKinds, topicProject, refresh]);
   const current = state.key === key;
   return {
     data: current ? state.data : null,

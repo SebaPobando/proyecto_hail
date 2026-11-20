@@ -15,6 +15,7 @@ from ninja.errors import HttpError
 from apps.audit.services import record
 from apps.projects.models import Project
 from apps.projects.permissions import can_operate, visible_project
+from apps.realtime.events import notify_on_commit
 
 from .models import PRIORITY_RANK, Alarm, Priority
 from .schemas import AcknowledgeIn, AlarmOut, ProjectAlarmSummary
@@ -26,7 +27,7 @@ HISTORY_LIMIT = 200
 
 def alarms_for(user):
     return Alarm.objects.filter(project__in=Project.objects.for_user(user)).select_related(
-        "project", "rule__signal", "acknowledged_by"
+        "project", "rule__signal", "rule__device", "acknowledged_by"
     )
 
 
@@ -89,7 +90,8 @@ def acknowledge(request, alarm_id: int, payload: AcknowledgeIn):
         actor=request.user,
         organization=project.organization,
         target=alarm,
-        tag=alarm.rule.signal.tag,
+        tag=alarm.rule.subject,
         comment=alarm.ack_comment,
     )
+    notify_on_commit(project.slug, "alarms")
     return alarm

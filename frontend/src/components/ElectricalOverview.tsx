@@ -60,7 +60,7 @@ function Gauge({ label, value, amount, max, color, scale }: { label: string; val
 
 export default function ElectricalOverview({ project }: { project: ProjectSummary }) {
   const detail = usePolling(signal => getProject(project.slug, signal), 0, `detail:${project.slug}`);
-  const latest = usePolling(signal => getLatest(project.slug, signal), 5000, `meters:${project.slug}`);
+  const latest = usePolling(signal => getLatest(project.slug, signal), 5000, `meters:${project.slug}`, true, { kinds: ['telemetry'], project: project.slug });
   const meters = buildMeters(detail.data?.devices ?? [], latest.data?.readings ?? []);
   const [route, setRoute] = useRouteValue('meter', 'all', ['all', ...meters.map(meter => meter.code)]);
   const selected = meters.find(meter => meter.code === route) ?? null;

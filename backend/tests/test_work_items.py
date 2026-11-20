@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import Client
 from django.utils import timezone
 
-from apps.alarms.models import Alarm
+from apps.alarms.models import Alarm, AlarmRule
 from apps.operations.models import WorkItem
 from apps.tenancy.models import Membership
 
@@ -15,6 +15,8 @@ from .test_alarms import member, send_water
 @pytest.fixture
 def seeded(db):
     call_command("seed_demo")
+    # Las pruebas de activación asumen alarmas inmediatas; la persistencia se prueba aparte.
+    AlarmRule.objects.update(on_delay=0)
 
 
 @pytest.fixture

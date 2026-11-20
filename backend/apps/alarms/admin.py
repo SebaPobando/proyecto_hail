@@ -5,24 +5,39 @@ from .models import Alarm, AlarmRule
 
 @admin.register(AlarmRule)
 class AlarmRuleAdmin(admin.ModelAdmin):
-    list_display = ["signal", "condition_display", "priority", "deadband", "message", "is_enabled", "project"]
-    list_filter = ["signal__project__organization", "signal__project", "priority", "condition", "is_enabled"]
-    search_fields = ["signal__tag", "signal__description", "message"]
-    autocomplete_fields = ["signal"]
-    list_select_related = ["signal__project"]
+    list_display = [
+        "subject",
+        "condition_display",
+        "priority",
+        "on_delay",
+        "deadband",
+        "message",
+        "is_enabled",
+        "project",
+    ]
+    list_filter = ["project__organization", "project", "priority", "condition", "is_enabled"]
+    search_fields = ["signal__tag", "signal__description", "device__code", "device__name", "message"]
+    autocomplete_fields = ["signal", "device"]
+    list_select_related = ["project", "signal", "device"]
     list_editable = ["is_enabled"]
     fieldsets = [
-        (None, {"fields": ["signal", "condition", "threshold", "deadband"]}),
+        (
+            None,
+            {
+                "fields": ["condition", "signal", "device", "threshold", "deadband", "on_delay"],
+                "description": "Alto, bajo y estado se aplican a una señal; «sin comunicación», a un dispositivo.",
+            },
+        ),
         ("Para el operador", {"fields": ["priority", "message", "is_enabled"]}),
     ]
+
+    @admin.display(description="señal o dispositivo")
+    def subject(self, obj):
+        return obj.subject
 
     @admin.display(description="condición")
     def condition_display(self, obj):
         return obj.describe()
-
-    @admin.display(description="proyecto", ordering="signal__project__name")
-    def project(self, obj):
-        return obj.signal.project
 
 
 @admin.register(Alarm)
@@ -39,10 +54,10 @@ class AlarmAdmin(admin.ModelAdmin):
         "acknowledged_by",
         "simulated",
     ]
-    list_filter = ["project__organization", "project", "rule__priority", "simulated"]
-    search_fields = ["rule__signal__tag", "rule__signal__description", "ack_comment"]
+    list_filter = ["project__organization", "project", "rule__priority", "rule__condition", "simulated"]
+    search_fields = ["rule__signal__tag", "rule__signal__description", "rule__device__code", "ack_comment"]
     date_hierarchy = "raised_at"
-    list_select_related = ["project", "rule__signal", "acknowledged_by"]
+    list_select_related = ["project", "rule__signal", "rule__device", "acknowledged_by"]
 
     @admin.display(description="prioridad", ordering="rule__priority")
     def priority(self, obj):
